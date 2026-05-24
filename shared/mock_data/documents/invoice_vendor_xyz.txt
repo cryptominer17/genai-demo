@@ -1,0 +1,101 @@
+================================================================================
+INVOICE
+================================================================================
+CloudScale Solutions Inc.
+1200 Exposition Blvd, Suite 400
+Austin, TX 78703
+Tax ID: 47-2918374
+support@cloudscale.io | (512) 555-0182
+
+--------------------------------------------------------------------------------
+BILL TO:                                INVOICE DETAILS:
+Fidelity Institutional                  Invoice #:    CSI-2024-03-0089
+Attn: Accounts Payable                  Invoice Date: March 31, 2024
+245 Summer Street                       Due Date:     April 30, 2024
+Boston, MA 02210                        PO Number:    FID-PO-2024-1142
+accounts.payable@fidelity.com           Terms:        Net 30
+--------------------------------------------------------------------------------
+
+SERVICE PERIOD: March 1, 2024 – March 31, 2024
+
+DESCRIPTION OF SERVICES
+--------------------------
+                                                        UNIT      EXTENDED
+ITEM  DESCRIPTION                        QTY    UNIT   PRICE       AMOUNT
+────  ───────────────────────────────── ──────  ─────  ──────    ──────────
+001   EC2 Compute — t3.xlarge            720    hrs    $ 0.1664  $  119.81
+      Instance: i-0a4f7bc8d23e91f2a
+      Region: us-east-1 (N. Virginia)
+      Usage: AI Platform API cluster
+
+002   EC2 Compute — m5.2xlarge           720    hrs    $ 0.3840  $  276.48
+      Instance: i-0b8c3ef1290d47a6e
+      Region: us-east-1 (N. Virginia)
+      Usage: Data pipeline processing
+
+003   Amazon S3 — Standard Storage       500    GB     $ 0.0230  $   11.50
+      Bucket: fid-ai-platform-prod
+      Usage: Model artifacts, audit logs
+
+004   Amazon RDS — PostgreSQL            1      mo     $  98.00  $   98.00
+      db.t3.medium, Single-AZ
+      Region: us-east-1
+      Usage: Platform metadata / config DB
+
+005   CloudFront — Data Transfer          2.4   TB     $ 0.0850  $  204.00
+      Distribution: E1ABCD2EFGHIJK
+      Usage: AI response caching / CDN
+
+006   Premium Support — Business Tier     1     mo     $ 500.00  $  500.00
+      Includes: 24/7 production support,
+      Technical Account Manager access,
+      SLA: 1-hr response for critical issues
+
+007   Managed Backup — Daily Snapshots    1     mo     $  45.00  $   45.00
+      Retention: 30 days
+      Covers: RDS + critical S3 buckets
+
+────  ───────────────────────────────── ──────  ─────  ──────    ──────────
+                                                    SUBTOTAL:    $1,254.79
+                                          TAX (Texas 8.25%):    $  103.52
+                                         ────────────────────   ──────────
+                                               TOTAL DUE:       $1,358.31
+                                         ────────────────────   ──────────
+
+PAYMENT INSTRUCTIONS
+----------------------
+Please remit payment by April 30, 2024.
+
+  Wire Transfer / ACH:
+    Bank:           First Republic Business Bank
+    Routing:        121140399
+    Account:        8801-4472-991
+    Account Name:   CloudScale Solutions Inc.
+
+  Check:
+    Payable to:     CloudScale Solutions Inc.
+    Mail to:        1200 Exposition Blvd, Suite 400
+                    Austin, TX 78703
+                    Attn: Billing Department
+
+  Reference:        Invoice # CSI-2024-03-0089 and PO # FID-PO-2024-1142
+  Questions:        billing@cloudscale.io | (512) 555-0182 ext. 4
+
+LATE PAYMENT NOTICE
+---------------------
+Invoices not paid within Net 30 terms are subject to a 1.5% monthly
+finance charge (18% APR) on the outstanding balance. CloudScale Solutions
+reserves the right to suspend services for accounts more than 45 days past due.
+
+NOTES
+-------
+- Usage data exported from AWS Cost Explorer; detailed usage report attached.
+- All compute billed at on-demand rates; reserved instance pricing negotiation
+  in progress for Q2 2024 (estimated savings: ~35%).
+- This invoice supersedes any prior estimates for March 2024 services.
+
+Thank you for your business. We value our partnership with Fidelity Institutional.
+
+================================================================================
+CloudScale Solutions Inc. | Invoice CSI-2024-03-0089 | Page 1 of 1
+================================================================================

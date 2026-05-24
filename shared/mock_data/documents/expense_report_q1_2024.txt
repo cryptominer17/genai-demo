@@ -1,0 +1,136 @@
+================================================================================
+EXPENSE REPORT — Q1 2024
+================================================================================
+Department:       Engineering — AI Platform
+Cost Center:      ENG-4471
+Submitted By:     Arjun Mehta, Senior Staff Engineer
+Employee ID:      EMP-20847
+Manager:          Priya Nair, VP Engineering
+Period Covered:   January 1, 2024 – March 31, 2024
+Submission Date:  March 31, 2024
+Currency:         USD
+Status:           PENDING CFO REVIEW
+--------------------------------------------------------------------------------
+
+SECTION 1: TRAVEL & TRANSPORTATION
+------------------------------------
+Purpose: Q1 team onsite (NYC HQ) + AWS re:Invent attendance (Las Vegas, NV)
+
+  1.1  Round-trip airfare — DFW → JFK (Delta, Jan 22–25)
+       Receipt #: DEL-2024-0122         $  612.40
+       Business purpose: Team strategy onsite, NYC HQ
+
+  1.2  Hotel — Marriott Midtown Manhattan (3 nights, Jan 22–25)
+       Receipt #: MAR-2024-0122         $  987.00   ($329.00/night)
+       Business purpose: Team strategy onsite, NYC HQ
+
+  1.3  Ground transport — JFK taxi/rideshare (arrival + departure)
+       Receipt #: LYFT-2024-0122        $   87.50
+       Receipt #: LYFT-2024-0125        $   91.20
+
+  1.4  Per diem — NYC (3 days @ $79/day GSA rate)
+       Per Diem #: PD-2024-Q1-001       $  237.00
+
+  1.5  Round-trip airfare — DFW → LAS (Southwest, Mar 3–7)
+       Receipt #: SW-2024-0303          $  389.00
+       Business purpose: AWS re:Invent 2024 — Cloud Architecture track
+
+  1.6  Hotel — MGM Grand Las Vegas (4 nights, Mar 3–7)
+       Receipt #: MGM-2024-0303         $  756.00   ($189.00/night)
+       Business purpose: AWS re:Invent 2024
+
+  1.7  Ground transport — LAS airport (arrival + departure)
+       Receipt #: UBER-2024-0303        $   34.75
+       Receipt #: UBER-2024-0307        $   38.90
+
+  1.8  Per diem — Las Vegas (4 days @ $79/day GSA rate)
+       Per Diem #: PD-2024-Q1-002       $  316.00
+
+                              TRAVEL SUBTOTAL:    $3,549.75
+--------------------------------------------------------------------------------
+
+SECTION 2: SOFTWARE & LICENSES
+---------------------------------
+  2.1  Datadog — Infrastructure & APM monitoring (annual license)
+       Vendor Invoice #: DD-INV-24-0101  $2,400.00
+       Business purpose: Production observability for AI platform services
+
+  2.2  GitHub Enterprise — Team seat (12 months)
+       Vendor Invoice #: GH-ENT-24Q1    $1,800.00
+       Business purpose: Source control, CI/CD workflows
+
+  2.3  Jira Software — Cloud (10 seats x 12 months)
+       Vendor Invoice #: JIRA-24-Q1     $  600.00
+       Business purpose: Sprint planning and backlog management
+
+  2.4  Zoom Workplace Pro — Team license (12 months)
+       Vendor Invoice #: ZM-24-ENT      $  480.00
+       Business purpose: Video conferencing for distributed team
+
+                              SOFTWARE SUBTOTAL:  $5,280.00
+--------------------------------------------------------------------------------
+
+SECTION 3: TRAINING & PROFESSIONAL DEVELOPMENT
+-------------------------------------------------
+  3.1  AWS re:Invent 2024 — Conference registration
+       Receipt #: AWS-REINVENT-2024     $2,200.00
+       Business purpose: Cloud-native AI architecture, Bedrock, SageMaker sessions
+
+  3.2  eCornell — AI Leadership Certificate Program (Q1 module)
+       Receipt #: ECORNELL-2024-Q1      $1,800.00
+       Business purpose: Executive AI leadership development, approved by VP
+
+  3.3  Internal workshops — Fidelity AI Guild (facilitator materials)
+       Receipt #: FID-GUILD-Q1          $  400.00
+       Business purpose: 3x internal "AI Foundations" sessions, ~25 attendees each
+
+                              TRAINING SUBTOTAL:  $4,400.00
+--------------------------------------------------------------------------------
+
+SECTION 4: EQUIPMENT & SUPPLIES
+----------------------------------
+  4.1  LG 27" 4K UHD Monitor (model 27UK850-W)
+       Receipt #: AMZN-2024-0203        $  449.99
+       Business purpose: Second monitor for home-office dev environment
+
+  4.2  Logitech MX Keys keyboard + MX Master 3 mouse (bundle)
+       Receipt #: BSTBY-2024-0115       $  119.99
+       Business purpose: Ergonomic peripherals, RSI prevention
+
+  4.3  Cable management kit + desk organizer
+       Receipt #: AMZN-2024-0115        $   44.75
+       Business purpose: Workspace organisation
+
+                              EQUIPMENT SUBTOTAL: $  614.73
+--------------------------------------------------------------------------------
+
+EXPENSE SUMMARY
+-----------------
+  Travel & Transportation     $3,549.75
+  Software & Licenses         $5,280.00
+  Training & Development      $4,400.00
+  Equipment & Supplies        $  614.73
+  ─────────────────────────────────────
+  TOTAL CLAIMED               $13,844.48
+
+  Pre-approved budget (Q1)    $14,000.00
+  Variance                    $   155.52  UNDER BUDGET
+--------------------------------------------------------------------------------
+
+APPROVAL CHAIN
+----------------
+  Level 1 — Direct Manager:    Priya Nair               APPROVED  2024-04-01
+  Level 2 — Engineering Dir:   Marcus Webb              APPROVED  2024-04-02
+  Level 3 — Finance Review:    Compliance Team          APPROVED  2024-04-03
+  Level 4 — CFO Sign-off:      [Pending]                PENDING
+
+NOTES
+-------
+All receipts attached as PDF in Concur expense system (Report ID: EXP-2024-Q1-4471).
+Foreign transaction fees: None (all USD).
+Personal charges excluded and zeroed out.
+Mileage reimbursement: Not applicable (all air travel).
+
+================================================================================
+END OF REPORT
+================================================================================

@@ -1,0 +1,3 @@
+# App-specific additions (shared/ has core deps)
+pypdf2==3.0.1
+python-docx==1.1.0

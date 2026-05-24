@@ -1,0 +1,264 @@
+{
+  "metadata": {
+    "title": "Fidelity Institutional — RIA Distribution Performance Dashboard",
+    "data_as_of": "2026-05-15",
+    "period": "Q2 2026 QTD",
+    "note": "All data is synthetic and generated for demonstration purposes only."
+  },
+
+  "kpi_cards": {
+    "total_aum_on_platform_m": 3847.5,
+    "total_net_flows_qtd_m": 42.3,
+    "active_ria_relationships": 13,
+    "at_risk_relationships": 4,
+    "top_region_by_net_flows": "West"
+  },
+
+  "ria_dataset": [
+    {
+      "ria_firm_name": "Reeves Wealth Partners",
+      "region": "Southwest",
+      "aum_on_platform_m": 84.5,
+      "net_flows_qtd_m": -2.5,
+      "product_mix_pct_etf": 35,
+      "product_mix_pct_mutual_fund": 40,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 6,
+      "last_rd_touchpoint": "2026-05-12",
+      "rd_owner": "Michael Tanaka",
+      "status": "At-Risk"
+    },
+    {
+      "ria_firm_name": "Meridian Capital Advisors",
+      "region": "Northeast",
+      "aum_on_platform_m": 412.0,
+      "net_flows_qtd_m": 18.2,
+      "product_mix_pct_etf": 50,
+      "product_mix_pct_mutual_fund": 20,
+      "product_mix_pct_model_portfolio": 30,
+      "engagement_score": 9,
+      "last_rd_touchpoint": "2026-05-08",
+      "rd_owner": "Priya Nambiar",
+      "status": "Growth"
+    },
+    {
+      "ria_firm_name": "Bluewater Wealth Management",
+      "region": "West",
+      "aum_on_platform_m": 298.7,
+      "net_flows_qtd_m": 22.4,
+      "product_mix_pct_etf": 60,
+      "product_mix_pct_mutual_fund": 15,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 8,
+      "last_rd_touchpoint": "2026-05-01",
+      "rd_owner": "Dana Whitfield",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Clearpath Financial Group",
+      "region": "Southeast",
+      "aum_on_platform_m": 187.3,
+      "net_flows_qtd_m": -4.1,
+      "product_mix_pct_etf": 30,
+      "product_mix_pct_mutual_fund": 55,
+      "product_mix_pct_model_portfolio": 15,
+      "engagement_score": 5,
+      "last_rd_touchpoint": "2026-04-28",
+      "rd_owner": "James Okafor",
+      "status": "At-Risk"
+    },
+    {
+      "ria_firm_name": "Summit Ridge Advisors",
+      "region": "Midwest",
+      "aum_on_platform_m": 221.6,
+      "net_flows_qtd_m": 9.8,
+      "product_mix_pct_etf": 40,
+      "product_mix_pct_mutual_fund": 35,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 7,
+      "last_rd_touchpoint": "2026-05-06",
+      "rd_owner": "Lisa Huang",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Harborview Wealth Partners",
+      "region": "Northeast",
+      "aum_on_platform_m": 389.4,
+      "net_flows_qtd_m": 14.6,
+      "product_mix_pct_etf": 55,
+      "product_mix_pct_mutual_fund": 20,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 9,
+      "last_rd_touchpoint": "2026-05-10",
+      "rd_owner": "Priya Nambiar",
+      "status": "Growth"
+    },
+    {
+      "ria_firm_name": "Ashford Legacy Group",
+      "region": "Southeast",
+      "aum_on_platform_m": 145.2,
+      "net_flows_qtd_m": 3.1,
+      "product_mix_pct_etf": 25,
+      "product_mix_pct_mutual_fund": 50,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 6,
+      "last_rd_touchpoint": "2026-04-22",
+      "rd_owner": "James Okafor",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Pacific Crest Capital",
+      "region": "West",
+      "aum_on_platform_m": 504.1,
+      "net_flows_qtd_m": 31.7,
+      "product_mix_pct_etf": 65,
+      "product_mix_pct_mutual_fund": 10,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 10,
+      "last_rd_touchpoint": "2026-05-09",
+      "rd_owner": "Dana Whitfield",
+      "status": "Growth"
+    },
+    {
+      "ria_firm_name": "Riverton Private Wealth",
+      "region": "Midwest",
+      "aum_on_platform_m": 176.8,
+      "net_flows_qtd_m": -1.9,
+      "product_mix_pct_etf": 35,
+      "product_mix_pct_mutual_fund": 45,
+      "product_mix_pct_model_portfolio": 20,
+      "engagement_score": 5,
+      "last_rd_touchpoint": "2026-04-15",
+      "rd_owner": "Lisa Huang",
+      "status": "At-Risk"
+    },
+    {
+      "ria_firm_name": "Keystone Advisor Group",
+      "region": "Northeast",
+      "aum_on_platform_m": 267.9,
+      "net_flows_qtd_m": 7.3,
+      "product_mix_pct_etf": 45,
+      "product_mix_pct_mutual_fund": 30,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 7,
+      "last_rd_touchpoint": "2026-05-02",
+      "rd_owner": "Priya Nambiar",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Crestwood Planning Associates",
+      "region": "Southwest",
+      "aum_on_platform_m": 119.3,
+      "net_flows_qtd_m": 4.4,
+      "product_mix_pct_etf": 30,
+      "product_mix_pct_mutual_fund": 40,
+      "product_mix_pct_model_portfolio": 30,
+      "engagement_score": 7,
+      "last_rd_touchpoint": "2026-04-30",
+      "rd_owner": "Michael Tanaka",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Thornfield Investment Partners",
+      "region": "West",
+      "aum_on_platform_m": 338.6,
+      "net_flows_qtd_m": 12.9,
+      "product_mix_pct_etf": 55,
+      "product_mix_pct_mutual_fund": 15,
+      "product_mix_pct_model_portfolio": 30,
+      "engagement_score": 8,
+      "last_rd_touchpoint": "2026-05-05",
+      "rd_owner": "Dana Whitfield",
+      "status": "Growth"
+    },
+    {
+      "ria_firm_name": "Lakewood Financial Services",
+      "region": "Midwest",
+      "aum_on_platform_m": 93.4,
+      "net_flows_qtd_m": -3.3,
+      "product_mix_pct_etf": 20,
+      "product_mix_pct_mutual_fund": 60,
+      "product_mix_pct_model_portfolio": 20,
+      "engagement_score": 4,
+      "last_rd_touchpoint": "2026-04-10",
+      "rd_owner": "Lisa Huang",
+      "status": "At-Risk"
+    },
+    {
+      "ria_firm_name": "Redwood Integrated Advisors",
+      "region": "West",
+      "aum_on_platform_m": 241.8,
+      "net_flows_qtd_m": 8.6,
+      "product_mix_pct_etf": 50,
+      "product_mix_pct_mutual_fund": 20,
+      "product_mix_pct_model_portfolio": 30,
+      "engagement_score": 8,
+      "last_rd_touchpoint": "2026-05-07",
+      "rd_owner": "Dana Whitfield",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Heritage Trust Advisors",
+      "region": "Southeast",
+      "aum_on_platform_m": 166.9,
+      "net_flows_qtd_m": 2.8,
+      "product_mix_pct_etf": 28,
+      "product_mix_pct_mutual_fund": 47,
+      "product_mix_pct_model_portfolio": 25,
+      "engagement_score": 6,
+      "last_rd_touchpoint": "2026-04-25",
+      "rd_owner": "James Okafor",
+      "status": "Active"
+    },
+    {
+      "ria_firm_name": "Galloway Wealth Strategies",
+      "region": "Southwest",
+      "aum_on_platform_m": 200.0,
+      "net_flows_qtd_m": 5.5,
+      "product_mix_pct_etf": 40,
+      "product_mix_pct_mutual_fund": 30,
+      "product_mix_pct_model_portfolio": 30,
+      "engagement_score": 8,
+      "last_rd_touchpoint": "2026-05-03",
+      "rd_owner": "Michael Tanaka",
+      "status": "Active"
+    }
+  ],
+
+  "chart_narratives": {
+    "chart_1_bar_net_flows_by_region": {
+      "title": "Net Flows QTD by Region ($M)",
+      "type": "bar",
+      "data_summary": {
+        "West": 75.6,
+        "Northeast": 40.1,
+        "Midwest": 4.6,
+        "Southwest": 7.4,
+        "Southeast": 1.8
+      },
+      "ai_insight": "The West region is the platform's top net flow contributor this quarter, driven primarily by Pacific Crest Capital and Thornfield Investment Partners — both high-engagement, ETF-heavy books showing strong growth momentum."
+    },
+    "chart_2_scatter_aum_vs_engagement": {
+      "title": "AUM on Platform vs. Engagement Score",
+      "type": "scatter",
+      "axes": {
+        "x": "AUM on Platform ($M)",
+        "y": "Engagement Score (1–10)",
+        "color_dimension": "Status (Active / At-Risk / Growth)"
+      },
+      "ai_insight": "Firms with engagement scores of 8 or above cluster around the highest AUM bands — suggesting engagement quality is a leading indicator of asset retention and growth on the platform."
+    },
+    "chart_3_donut_product_mix": {
+      "title": "Product Mix Across All RIA Relationships",
+      "type": "donut",
+      "aggregated_mix_pct": {
+        "ETF": 42,
+        "Mutual_Fund": 31,
+        "Model_Portfolio": 27
+      },
+      "ai_insight": "Model Portfolio adoption has reached 27% of blended product mix — up from an estimated 19% a year ago — reflecting accelerating advisor migration from direct indexing and legacy mutual fund sleeves toward platform-managed models."
+    }
+  },
+
+  "cross_reference_note": "Reeves Wealth Partners (Sandra Reeves) appears as At-Risk with RD Michael Tanaka and last touchpoint 2026-05-12, matching the audio transcript scenario. Delacroix client retention risk is the driver of At-Risk flag."
+}

@@ -1,0 +1,25 @@
+[Unit]
+Description=Streamlit Report Generator App (Port 8503)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/streamlit run apps/report_generator/streamlit_app.py \
+  --server.port 8503 \
+  --server.address localhost \
+  --server.baseUrlPath /BI_Dashboard \
+  --server.headless true \
+  --browser.gatherUsageStats false
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/report-generator.log
+StandardError=append:/var/log/streamlit/report-generator-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target

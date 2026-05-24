@@ -1,0 +1,25 @@
+[Unit]
+Description=Streamlit Document Intelligence App (Port 8501)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/streamlit run apps/document_intelligence/streamlit_app.py \
+  --server.port 8501 \
+  --server.address localhost \
+  --server.baseUrlPath /Document_AI \
+  --server.headless true \
+  --browser.gatherUsageStats false
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/doc-intelligence.log
+StandardError=append:/var/log/streamlit/doc-intelligence-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target

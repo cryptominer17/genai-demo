@@ -1,0 +1,26 @@
+product_id,product_name,sku,category,subcategory,quantity_on_hand,reorder_point,unit_cost,list_price,margin_pct,warehouse_location,last_updated,status
+PRD-001,Cloud License Annual,SKU-1001,Software,SaaS License,142,50,600,2000,70.0,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-002,Support Package Premium,SKU-1002,Services,Support,88,30,450,1500,70.0,WH-Chicago,2024-03-20 14:30:00,Active
+PRD-003,Data Analytics Module,SKU-1003,Software,Analytics,67,25,1200,5000,76.0,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-004,Implementation Services,SKU-1004,Services,Professional Services,215,80,175,500,65.0,WH-NYC,2024-03-20 14:30:00,Active
+PRD-005,Training Enablement,SKU-1005,Services,Training,93,40,280,800,65.0,WH-SFO,2024-03-20 14:30:00,Active
+PRD-006,Cloud License Annual - Starter,SKU-1006,Software,SaaS License,58,30,350,1200,70.8,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-007,Cloud License Annual - Enterprise,SKU-1007,Software,SaaS License,34,20,900,3500,74.3,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-008,Support Package Standard,SKU-1008,Services,Support,112,45,200,600,66.7,WH-Chicago,2024-03-20 14:30:00,Active
+PRD-009,Support Package Basic,SKU-1009,Services,Support,18,25,120,350,65.7,WH-Chicago,2024-03-19 09:15:00,Reorder Required
+PRD-010,Data Analytics Module - Lite,SKU-1010,Software,Analytics,41,20,600,2200,72.7,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-011,Data Analytics Module - Pro,SKU-1011,Software,Analytics,9,15,1800,7500,76.0,WH-SFO,2024-03-19 11:45:00,Reorder Required
+PRD-012,Implementation Services - Express,SKU-1012,Services,Professional Services,78,35,200,600,66.7,WH-NYC,2024-03-20 14:30:00,Active
+PRD-013,Implementation Services - Full,SKU-1013,Services,Professional Services,156,60,350,900,61.1,WH-Chicago,2024-03-20 14:30:00,Active
+PRD-014,Training Enablement - Admin,SKU-1014,Services,Training,45,20,300,850,64.7,WH-SFO,2024-03-20 14:30:00,Active
+PRD-015,Training Enablement - End User,SKU-1015,Services,Training,62,25,180,550,67.3,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-016,Platform Bundle - Starter Pack,SKU-1016,Bundle,Bundled Offer,33,20,1200,3800,68.4,WH-NYC,2024-03-20 14:30:00,Active
+PRD-017,Platform Bundle - Growth Pack,SKU-1017,Bundle,Bundled Offer,22,18,2200,7200,69.4,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-018,Platform Bundle - Enterprise Pack,SKU-1018,Bundle,Bundled Offer,11,12,4000,13500,70.4,WH-Chicago,2024-03-19 16:00:00,Active
+PRD-019,API Access License - Monthly,SKU-1019,Software,API License,89,40,150,500,70.0,WH-SFO,2024-03-20 14:30:00,Active
+PRD-020,API Access License - Annual,SKU-1020,Software,API License,57,25,1400,4800,70.8,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-021,Security Compliance Add-on,SKU-1021,Software,Security,24,18,400,1400,71.4,WH-NYC,2024-03-20 14:30:00,Active
+PRD-022,Custom Reporting Module,SKU-1022,Software,Analytics,13,15,900,3200,71.9,WH-Chicago,2024-03-19 08:30:00,Reorder Required
+PRD-023,Data Migration Service,SKU-1023,Services,Professional Services,46,20,500,1200,58.3,WH-Dallas,2024-03-20 14:30:00,Active
+PRD-024,Dedicated Account Manager,SKU-1024,Services,Account Management,8,10,1500,5000,70.0,WH-NYC,2024-03-19 14:00:00,Reorder Required
+PRD-025,SLA Premium Guarantee,SKU-1025,Services,Support,37,15,600,1800,66.7,WH-SFO,2024-03-20 14:30:00,Active

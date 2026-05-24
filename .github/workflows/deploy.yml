@@ -1,0 +1,69 @@
+name: Deploy to Digital Ocean Droplet
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        env:
+          DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DROPLET_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy to droplet
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              $DROPLET_USER@$DROPLET_IP \
+              'bash /opt/fi-genai-poc-platform/deployment/scripts/deploy.sh'
+
+      - name: Verify app health (wait for startup)
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+        run: |
+          echo "Waiting 20 seconds for services to stabilize..."
+          sleep 20
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              $DROPLET_USER@$DROPLET_IP \
+              'bash /opt/fi-genai-poc-platform/deployment/scripts/health_check.sh'
+
+      - name: Notify on success
+        if: success()
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              $DROPLET_USER@$DROPLET_IP \
+              'cd /opt/fi-genai-poc-platform && source venv/bin/activate && SMTP_PASSWORD="'"$SMTP_PASSWORD"'" python3 deployment/email/notify.py "SUCCESS" "Deployment completed successfully. All 3 apps are running."'
+
+      - name: Notify on failure
+        if: failure()
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              $DROPLET_USER@$DROPLET_IP \
+              'cd /opt/fi-genai-poc-platform && source venv/bin/activate && SMTP_PASSWORD="'"$SMTP_PASSWORD"'" python3 deployment/email/notify.py "FAILURE" "Deployment FAILED. Check GitHub Actions logs for details."' || true

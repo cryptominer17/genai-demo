@@ -1,0 +1,2 @@
+# App-specific additions (plotly already in shared)
+kaleido==0.2.1

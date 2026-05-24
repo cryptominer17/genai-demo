@@ -1,0 +1,44 @@
+{
+  "report_date": "2024-03-31",
+  "total_customers": 100,
+  "total_arr": 62300000,
+  "segmentation": {
+    "by_industry": {
+      "Technology": {"customer_count": 38, "arr_value": 24500000, "avg_contract_value": 644736, "health_score_avg": 88.5, "churn_rate": 0.03, "growth_rate": 0.15},
+      "Financial Services": {"customer_count": 25, "arr_value": 20100000, "avg_contract_value": 804000, "health_score_avg": 91.2, "churn_rate": 0.02, "growth_rate": 0.11},
+      "Healthcare": {"customer_count": 18, "arr_value": 9800000, "avg_contract_value": 544444, "health_score_avg": 84.3, "churn_rate": 0.08, "growth_rate": 0.07},
+      "Consulting": {"customer_count": 12, "arr_value": 4900000, "avg_contract_value": 408333, "health_score_avg": 86.1, "churn_rate": 0.05, "growth_rate": 0.09},
+      "SaaS": {"customer_count": 7, "arr_value": 3000000, "avg_contract_value": 428571, "health_score_avg": 82.7, "churn_rate": 0.10, "growth_rate": 0.20}
+    },
+    "by_company_size": {
+      "Enterprise": {"customer_count": 32, "arr_value": 46200000, "health_score_avg": 91.8, "expansion_potential": "high", "upsell_opportunities": 8},
+      "Mid-Market": {"customer_count": 45, "arr_value": 13100000, "health_score_avg": 86.4, "expansion_potential": "medium", "upsell_opportunities": 14},
+      "SMB": {"customer_count": 23, "arr_value": 3000000, "health_score_avg": 79.2, "expansion_potential": "low", "upsell_opportunities": 5}
+    },
+    "by_region": {
+      "Northeast": {"customer_count": 28, "arr_value": 19800000, "top_products": ["Cloud License Annual", "Data Analytics Module"]},
+      "West": {"customer_count": 24, "arr_value": 14200000, "top_products": ["Cloud License Annual", "Support Package Premium"]},
+      "Southeast": {"customer_count": 18, "arr_value": 12100000, "top_products": ["Data Analytics Module", "Implementation Services"]},
+      "Midwest": {"customer_count": 16, "arr_value": 9500000, "top_products": ["Cloud License Annual", "Training Enablement"]},
+      "Southwest": {"customer_count": 14, "arr_value": 6700000, "top_products": ["Support Package Premium", "Implementation Services"]}
+    },
+    "by_health_score": {
+      "champion_95_plus": {"count": 18, "arr_value": 22400000, "recommended_action": "Expand — introduce new modules and exec sponsorship"},
+      "healthy_85_to_94": {"count": 42, "arr_value": 28100000, "recommended_action": "Grow — QBRs, upsell opportunities, case studies"},
+      "needs_attention_70_to_84": {"count": 28, "arr_value": 9800000, "recommended_action": "Nurture — CSM outreach, health improvement plans"},
+      "at_risk_below_70": {"count": 12, "arr_value": 2000000, "recommended_action": "Intervene — executive escalation, remediation plans"}
+    }
+  },
+  "top_10_customers": [
+    {"rank": 1, "name": "FinServe Partners", "industry": "Financial Services", "arr": 500000, "health_score": 92, "renewal_date": "2025-01-10"},
+    {"rank": 2, "name": "Apex Analytics", "industry": "Financial Services", "arr": 480000, "health_score": 94, "renewal_date": "2025-06-15"},
+    {"rank": 3, "name": "Acme Corp", "industry": "Technology", "arr": 450000, "health_score": 95, "renewal_date": "2025-03-15"},
+    {"rank": 4, "name": "CloudBridge LLC", "industry": "Technology", "arr": 420000, "health_score": 91, "renewal_date": "2025-07-01"},
+    {"rank": 5, "name": "Horizon Group", "industry": "Healthcare", "arr": 395000, "health_score": 89, "renewal_date": "2025-04-30"},
+    {"rank": 6, "name": "Summit Financial", "industry": "Financial Services", "arr": 380000, "health_score": 90, "renewal_date": "2025-05-20"},
+    {"rank": 7, "name": "Sterling Partners", "industry": "Consulting", "arr": 360000, "health_score": 93, "renewal_date": "2025-02-28"},
+    {"rank": 8, "name": "Meridian Systems", "industry": "Healthcare", "arr": 340000, "health_score": 87, "renewal_date": "2025-08-15"},
+    {"rank": 9, "name": "DataVault Solutions", "industry": "Technology", "arr": 310000, "health_score": 85, "renewal_date": "2025-09-01"},
+    {"rank": 10, "name": "Quantum Analytics", "industry": "Technology", "arr": 290000, "health_score": 82, "renewal_date": "2025-10-31"}
+  ]
+}

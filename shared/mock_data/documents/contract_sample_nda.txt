@@ -1,0 +1,200 @@
+================================================================================
+MUTUAL NON-DISCLOSURE AGREEMENT
+================================================================================
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into as of
+March 1, 2024 ("Effective Date") by and between:
+
+  FIDELITY INSTITUTIONAL, a division of Fidelity Investments, with its
+  principal place of business at 245 Summer Street, Boston, MA 02210
+  ("Fidelity" or "Party A");
+
+  and
+
+  VERTEX ANALYTICS INC., a Delaware corporation with its principal place
+  of business at 3801 Kirby Drive, Suite 600, Houston, TX 77098
+  ("Vertex" or "Party B").
+
+  Fidelity and Vertex are referred to herein individually as a "Party" and
+  collectively as the "Parties."
+
+PURPOSE: The Parties wish to explore a potential business relationship
+involving the evaluation of Vertex's AI-driven data analytics platform for
+integration with Fidelity Institutional's enterprise data infrastructure
+("Permitted Purpose"). In connection with that evaluation, each Party may
+disclose to the other certain confidential and proprietary information.
+
+--------------------------------------------------------------------------------
+
+1. DEFINITIONS
+
+   1.1 "Confidential Information" means any non-public information disclosed
+   by one Party ("Disclosing Party") to the other Party ("Receiving Party"),
+   whether disclosed orally, in writing, electronically, or by any other means,
+   that is designated as confidential at the time of disclosure or that
+   reasonably should be understood to be confidential given the nature of the
+   information and circumstances of disclosure. Confidential Information
+   includes, without limitation: technical data, trade secrets, know-how,
+   research, product plans, product roadmaps, services, customers, customer
+   lists, markets, software, financial information, business forecasts,
+   and sales and marketing plans.
+
+   1.2 "Representative" means a Party's employees, officers, directors,
+   contractors, consultants, agents, or advisors who have a need to know
+   the Confidential Information for the Permitted Purpose.
+
+--------------------------------------------------------------------------------
+
+2. SCOPE OF CONFIDENTIAL INFORMATION
+
+   2.1 Confidential Information includes all information described in Section 1.1
+   that is disclosed in connection with the Permitted Purpose, regardless of
+   whether such information is marked "Confidential."
+
+   2.2 Confidential Information includes any analyses, compilations, notes,
+   or other documents prepared by either Party that incorporate or reflect
+   the other Party's Confidential Information.
+
+   2.3 The terms and existence of this Agreement are themselves Confidential
+   Information and shall not be disclosed without the prior written consent
+   of both Parties, except as required by applicable law or regulation.
+
+--------------------------------------------------------------------------------
+
+3. OBLIGATIONS OF RECEIVING PARTY
+
+   3.1 Each Party, as a Receiving Party, agrees to: (a) hold the Disclosing
+   Party's Confidential Information in strict confidence; (b) not disclose
+   such Confidential Information to any third party without prior written
+   consent of the Disclosing Party; (c) use the Confidential Information
+   solely for the Permitted Purpose; and (d) protect the Confidential
+   Information with at least the same degree of care it uses to protect its
+   own confidential information, but in no event less than reasonable care.
+
+   3.2 Each Party shall limit disclosure of Confidential Information to those
+   Representatives who have a legitimate need to know for the Permitted Purpose
+   and who are bound by confidentiality obligations no less protective than
+   those set forth in this Agreement.
+
+   3.3 Each Party shall promptly notify the Disclosing Party upon discovery of
+   any unauthorized use or disclosure of Confidential Information.
+
+--------------------------------------------------------------------------------
+
+4. EXCLUSIONS FROM CONFIDENTIAL INFORMATION
+
+   The obligations of this Agreement shall not apply to information that the
+   Receiving Party can demonstrate: (a) is or becomes publicly available through
+   no breach of this Agreement by the Receiving Party; (b) was rightfully in
+   the Receiving Party's possession prior to disclosure by the Disclosing Party
+   without restriction on disclosure; (c) is rightfully received from a third
+   party without restriction on disclosure; (d) is independently developed by
+   the Receiving Party without use of or reference to the Disclosing Party's
+   Confidential Information; or (e) is required to be disclosed by applicable
+   law, regulation, court order, or governmental authority, provided that the
+   Receiving Party gives the Disclosing Party prompt written notice prior to
+   such disclosure and cooperates with the Disclosing Party in seeking a
+   protective order.
+
+--------------------------------------------------------------------------------
+
+5. TERM
+
+   5.1 This Agreement shall commence on the Effective Date and shall continue
+   for a period of three (3) years, unless earlier terminated by either Party
+   upon thirty (30) days' prior written notice.
+
+   5.2 The confidentiality obligations with respect to Confidential Information
+   disclosed during the term shall survive termination or expiration of this
+   Agreement for a period of three (3) years from the date of initial disclosure.
+
+--------------------------------------------------------------------------------
+
+6. RETURN AND DESTRUCTION OF CONFIDENTIAL INFORMATION
+
+   Upon written request by the Disclosing Party or upon termination of this
+   Agreement, the Receiving Party shall promptly: (a) return or destroy all
+   tangible materials embodying the Disclosing Party's Confidential Information,
+   including all copies and extracts thereof; (b) permanently delete all
+   electronic copies from its systems; and (c) certify in writing within ten
+   (10) business days that it has complied with this Section 6. Notwithstanding
+   the foregoing, the Receiving Party may retain archival copies to the extent
+   required by applicable law or its standard document retention policies,
+   provided such copies remain subject to the confidentiality obligations herein.
+
+--------------------------------------------------------------------------------
+
+7. GOVERNING LAW AND DISPUTE RESOLUTION
+
+   This Agreement shall be governed by and construed in accordance with the
+   laws of the State of Texas, without regard to its conflict of law principles.
+   Any disputes arising out of or in connection with this Agreement shall be
+   subject to the exclusive jurisdiction of the state and federal courts
+   located in Dallas County, Texas, and the Parties hereby consent to personal
+   jurisdiction in such courts.
+
+--------------------------------------------------------------------------------
+
+8. REMEDIES
+
+   Each Party acknowledges that the unauthorized disclosure or use of
+   Confidential Information may cause irreparable harm for which monetary
+   damages would be an inadequate remedy, and that in the event of such breach
+   the Disclosing Party shall be entitled to seek equitable relief, including
+   injunction and specific performance, in addition to all other remedies
+   available at law or in equity, without the necessity of posting any bond
+   or proving actual damages.
+
+--------------------------------------------------------------------------------
+
+9. GENERAL PROVISIONS
+
+   9.1 No License. Nothing in this Agreement shall be construed as granting
+   either Party any license, right, or interest in the other Party's
+   Confidential Information except as expressly set forth herein.
+
+   9.2 No Obligation. This Agreement does not obligate either Party to
+   proceed with any transaction, partnership, or business relationship.
+
+   9.3 Entire Agreement. This Agreement constitutes the entire agreement
+   between the Parties with respect to its subject matter and supersedes
+   all prior or contemporaneous oral or written agreements relating thereto.
+
+   9.4 Amendment. This Agreement may not be amended except by a written
+   instrument signed by authorized representatives of both Parties.
+
+   9.5 Severability. If any provision of this Agreement is held invalid or
+   unenforceable, the remaining provisions shall continue in full force and
+   effect.
+
+   9.6 Counterparts. This Agreement may be executed in counterparts, each of
+   which shall be deemed an original, and electronic signatures shall be
+   deemed valid and binding.
+
+--------------------------------------------------------------------------------
+
+SIGNATURES
+------------
+
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the
+Effective Date written above.
+
+FIDELITY INSTITUTIONAL                   VERTEX ANALYTICS INC.
+(a division of Fidelity Investments)
+
+Signature: ___________________________   Signature: ___________________________
+
+Name:      David R. Callahan             Name:      Samantha K. Torres
+Title:     Managing Director,            Title:     Chief Executive Officer
+           Enterprise Technology
+
+Date:      March 1, 2024                 Date:      March 1, 2024
+
+Address:   245 Summer Street             Address:   3801 Kirby Drive, Suite 600
+           Boston, MA 02210                         Houston, TX 77098
+
+Email:     d.callahan@fidelity.com       Email:     storres@vertexanalytics.io
+
+================================================================================
+END OF AGREEMENT — DOCUMENT ID: NDA-FID-2024-0301-VA
+================================================================================

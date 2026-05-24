@@ -1,0 +1,25 @@
+[Unit]
+Description=Streamlit Data Q&A App (Port 8502)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/streamlit run apps/data_qa/streamlit_app.py \
+  --server.port 8502 \
+  --server.address localhost \
+  --server.baseUrlPath /Text_to_SQL \
+  --server.headless true \
+  --browser.gatherUsageStats false
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/data-qa.log
+StandardError=append:/var/log/streamlit/data-qa-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target
