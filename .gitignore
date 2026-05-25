@@ -44,3 +44,6 @@ Thumbs.db
 # ── Database ─────────────────────────────────────────────────────────────────
 *.sqlite3
 *.db
+
+# ── Separate projects (not part of this repo) ────────────────────────────────
+ai-platform/
