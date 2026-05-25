@@ -3,560 +3,1094 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FI GenAI PoC Platform - Admin</title>
+<title>FI GenAI PoC Platform — Admin</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* ── Reset & Base ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-  background: #f5f7fa;
-  color: #333;
-}
-
-.container {
-  display: flex;
-  gap: 24px;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 24px;
+  background: #f4f6f4;
+  color: #1a1a1a;
   min-height: 100vh;
 }
 
-/* Sidebar */
+/* ── Tokens ── */
+:root {
+  --green:        #006633;
+  --green-dark:   #004d26;
+  --green-mid:    #007a3d;
+  --green-light:  #e6f2ec;
+  --green-tint:   #f0f7f3;
+  --green-border: #c2dccb;
+  --surface:      #ffffff;
+  --bg:           #f4f6f4;
+  --text:         #1a1a1a;
+  --text-mid:     #4a5a4a;
+  --text-muted:   #7a8a7a;
+  --border:       #dde5dd;
+  --border-light: #eef2ee;
+}
+
+/* ── Layout ── */
+.layout { display: flex; min-height: 100vh; }
+
+/* ══════════════════════════════
+   SIDEBAR
+══════════════════════════════ */
 .sidebar {
-  width: 280px;
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
+  width: 256px;
+  flex-shrink: 0;
+  background: var(--green);
   display: flex;
   flex-direction: column;
-  height: fit-content;
   position: sticky;
-  top: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
-.sidebar-header {
+.sidebar-brand {
+  padding: 22px 18px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 28px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a202c;
+  gap: 12px;
 }
+.brand-mark { width: 36px; height: 36px; flex-shrink: 0; }
+.brand-name { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.1px; }
+.brand-sub  { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 400; margin-top: 1px; }
 
+.sidebar-nav { flex: 1; padding: 12px 10px; }
 .nav-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #a0aec0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 12px 0 8px 0;
-  margin-top: 16px;
   display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  padding: 14px 10px 5px;
 }
-
-.nav-section { margin-bottom: 8px; }
-
-.nav-item {
-  padding: 10px 12px;
-  margin: 4px 0;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #4a5568;
-  transition: all 0.2s;
-  border-left: 3px solid transparent;
+.nav-link {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 2px 0;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.13s, color 0.13s;
+  position: relative;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-link.active {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-weight: 600;
+}
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 7px; bottom: 7px;
+  width: 3px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+.nav-icon { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; }
+.nav-link.active .nav-icon, .nav-link:hover .nav-icon { opacity: 1; }
+
+.nav-admin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin: 2px 0;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-weight: 500;
+  background: rgba(255,255,255,0.08);
+  transition: background 0.13s;
+}
+.nav-admin:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.admin-badge {
+  margin-left: auto;
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
 }
 
-.nav-item:hover { background: #f7fafc; }
-.nav-item.active { background: #e6f2ff; color: #2563eb; border-left-color: #2563eb; font-weight: 500; }
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.session-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+}
+.refresh-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  transition: background 0.13s, color 0.13s;
+}
+.refresh-btn:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); }
+
+.usage-metric { margin-bottom: 12px; }
+.usage-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.usage-lbl { font-size: 11px; color: rgba(255,255,255,0.55); font-weight: 500; }
+.usage-val { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; }
+.usage-track {
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.usage-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.6);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
 
 .logout-btn {
-  margin-top: auto;
-  padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  background: white;
+  width: 100%;
+  margin-top: 16px;
+  padding: 9px 14px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #4a5568;
-  transition: all 0.2s;
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
   font-weight: 500;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+}
+.logout-btn:hover {
+  background: rgba(220,38,38,0.18);
+  border-color: rgba(220,38,38,0.5);
+  color: #fca5a5;
 }
 
-.logout-btn:hover { border-color: #cbd5e0; background: #f7fafc; }
-
-.session-usage {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.usage-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #a0aec0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: block;
-  margin-bottom: 12px;
-}
-
-.usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.usage-item { text-align: center; }
-.usage-label-item { font-size: 12px; color: #a0aec0; margin-bottom: 4px; }
-.usage-value { font-size: 24px; font-weight: 700; color: #1a202c; }
-
-/* Main Content */
-.main { flex: 1; display: flex; flex-direction: column; gap: 24px; }
-
-.header {
-  background: white;
-  padding: 32px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+/* ══════════════════════════════
+   MAIN CONTENT
+══════════════════════════════ */
+.main {
+  flex: 1;
+  padding: 32px 36px;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
 }
 
-.header-left { flex: 1; }
-.header h1 { font-size: 28px; color: #1a202c; margin: 0 0 8px 0; font-weight: 700; }
-.header-subtitle { color: #718096; font-size: 14px; }
+/* Page Header */
+.page-header {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 28px 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.header-logo { width: 40px; height: 40px; flex-shrink: 0; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.header-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 
 .add-user-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 10px 20px;
-  background: #2563eb;
-  color: white;
+  background: var(--green);
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s;
+  white-space: nowrap;
+  transition: background 0.13s;
+  flex-shrink: 0;
+}
+.add-user-btn:hover { background: var(--green-dark); }
+
+/* ══════════════════════════════
+   DASHBOARD SUMMARY STRIP
+══════════════════════════════ */
+.summary-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
-.add-user-btn:hover { background: #1d4ed8; }
-
-/* Tabs */
-.tabs {
+.summary-card {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 20px 24px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   display: flex;
-  gap: 24px;
-  border-bottom: 1px solid #e2e8f0;
-  background: white;
-  padding: 0 32px;
-  margin-bottom: 0;
-  border-radius: 8px 8px 0 0;
+  align-items: center;
+  gap: 16px;
 }
-
-.tab {
-  padding: 16px 0;
-  cursor: pointer;
-  font-size: 14px;
+.summary-icon-wrap {
+  width: 44px; height: 44px;
+  border-radius: 9px;
+  background: var(--green-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.summary-icon { width: 20px; height: 20px; color: var(--green); }
+.summary-val {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.summary-lbl {
+  font-size: 12px;
+  color: var(--text-muted);
   font-weight: 500;
-  color: #718096;
-  border-bottom: 3px solid transparent;
-  transition: all 0.2s;
+  margin-top: 3px;
 }
 
-.tab:hover { color: #2d3748; }
-.tab.active { color: #2563eb; border-bottom-color: #2563eb; }
+/* ══════════════════════════════
+   SECTION CARD
+══════════════════════════════ */
+.section-card {
+  background: var(--surface);
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.section-card-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.section-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.section-card-meta { font-size: 13px; color: var(--text-muted); }
 
-/* Content Sections */
-.content-section { display: none; background: white; padding: 24px 32px; border-radius: 0 0 8px 8px; }
-.content-section.active { display: block; }
+/* ══════════════════════════════
+   SEARCH / FILTER BAR
+══════════════════════════════ */
+.table-toolbar {
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.search-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 33px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.search-input::placeholder { color: var(--text-muted); }
+.search-input:focus {
+  outline: none;
+  border-color: var(--green-border);
+  box-shadow: 0 0 0 3px rgba(0,102,51,0.08);
+  background: #fff;
+}
 
-/* Users Table */
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color 0.13s;
+}
+.filter-select:focus { outline: none; border-color: var(--green-border); }
+
+/* ══════════════════════════════
+   USER TABLE
+══════════════════════════════ */
 .table-wrapper { overflow-x: auto; }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13.5px;
 }
-
-thead {
-  background: #f7fafc;
-  border-bottom: 1px solid #e2e8f0;
-}
-
+thead { background: var(--green-tint); }
 th {
-  padding: 12px 16px;
+  padding: 11px 16px;
   text-align: left;
-  font-weight: 600;
-  color: #2d3748;
-}
-
-td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #e2e8f0;
-  color: #4a5568;
-}
-
-tbody tr:hover { background: #f9fafb; }
-
-.user-name { font-weight: 500; color: #1a202c; }
-.role-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.role-admin { background: #dcfce7; color: #166534; }
-.role-user { background: #e0e7ff; color: #312e81; }
-
-.status-active { color: #16a34a; font-weight: 600; }
-.status-inactive { color: #dc2626; font-weight: 600; }
-
-.action-btn {
-  padding: 6px 12px;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  white-space: nowrap;
   cursor: pointer;
+  user-select: none;
+}
+th:hover { color: var(--green); }
+th .sort-icon { display: inline-block; margin-left: 4px; opacity: 0.4; font-style: normal; }
+th.sort-asc .sort-icon, th.sort-desc .sort-icon { opacity: 1; color: var(--green); }
+td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-mid);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--green-tint); }
+
+.user-name { font-weight: 600; color: var(--text); font-size: 13.5px; }
+.user-email { font-size: 12.5px; color: var(--text-muted); }
+
+/* App badge chips */
+.app-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.app-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip-doc  { background: #dbeafe; color: #1e40af; }
+.chip-data { background: #fef3c7; color: #92400e; }
+.chip-rpt  { background: #ede9fe; color: #5b21b6; }
+.chip-all  { background: var(--green-light); color: var(--green); }
+
+/* Status pill */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.status-pill::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+.status-active  { background: #d1fae5; color: #065f46; }
+.status-active::before  { background: #10b981; }
+.status-inactive { background: #fee2e2; color: #991b1b; }
+.status-inactive::before { background: #ef4444; }
+
+/* Action buttons */
+.action-group { display: flex; gap: 6px; align-items: center; }
+.act-btn {
+  padding: 5px 11px;
+  border-radius: 5px;
   font-size: 12px;
-  font-weight: 500;
-  color: #2563eb;
-  transition: all 0.2s;
-  margin-right: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  transition: background 0.13s, border-color 0.13s;
+  white-space: nowrap;
+}
+.act-edit  { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
+.act-edit:hover  { background: #c6ddd0; border-color: #9abfaa; }
+.act-revoke { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+.act-revoke:hover { background: #fecaca; border-color: #f87171; }
+.act-reset { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.act-reset:hover { background: #fde68a; border-color: #fbbf24; }
+
+/* ══════════════════════════════
+   TOGGLE UI (Access Grants)
+══════════════════════════════ */
+.access-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.access-row {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 120px;
+  align-items: center;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.13s;
+}
+.access-row:last-child { border-bottom: none; }
+.access-row:hover { background: var(--green-tint); }
+.access-header {
+  background: var(--green-tint);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  padding: 11px 28px;
+  border-bottom: 1px solid var(--border-light);
+}
+.access-header-grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr 1fr 120px;
+  gap: 0;
 }
 
-.action-btn:hover { background: #e6f2ff; border-color: #bfdbfe; }
-.delete-btn { color: #dc2626; border-color: #fecaca; }
-.delete-btn:hover { background: #fee2e2; border-color: #fca5a5; }
+.toggle-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.toggle-label-sm { font-size: 11px; color: var(--text-muted); }
 
-/* Modal */
+/* Toggle switch */
+.toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  background: #d1d5db;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle input:checked + .toggle-track { background: var(--green); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+  pointer-events: none;
+}
+.toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+.toggle-state { font-size: 10px; font-weight: 600; color: var(--text-muted); }
+.toggle input:checked ~ .toggle-state { color: var(--green); }
+
+/* ══════════════════════════════
+   USAGE ANALYTICS
+══════════════════════════════ */
+.analytics-table td { font-size: 13px; }
+.bar-cell { min-width: 120px; }
+.bar-wrap {
+  height: 6px;
+  background: var(--border-light);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--green);
+  transition: width 0.5s ease;
+}
+.token-count { font-weight: 600; color: var(--text); }
+
+/* ══════════════════════════════
+   MODAL
+══════════════════════════════ */
 .modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0,0,0,0.45);
   z-index: 1000;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
-
 .modal.active { display: flex; }
-
-.modal-content {
-  background: white;
-  border-radius: 8px;
+.modal-box {
+  background: var(--surface);
+  border-radius: 12px;
   padding: 32px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-}
-
-.modal-header {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1a202c;
-  margin-bottom: 24px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 8px;
-}
-
-.form-input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.2s;
+  max-width: 500px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.18);
 }
-
-.form-input:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.checkbox-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 12px;
-  background: #f7fafc;
-  border-radius: 6px;
-}
-
-.checkbox-item {
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 24px;
   display: flex;
   align-items: center;
   gap: 10px;
 }
+.modal-title-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--green-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-title-icon svg { width: 17px; height: 17px; color: var(--green); }
 
-.checkbox-item input[type="checkbox"] {
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
+.form-group { margin-bottom: 18px; }
+.form-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-mid);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.form-input {
+  width: 100%;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13.5px;
+  color: var(--text);
+  background: #fff;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--green-border);
+  box-shadow: 0 0 0 3px rgba(0,102,51,0.08);
 }
 
-.checkbox-item label {
-  cursor: pointer;
-  font-size: 14px;
-  color: #4a5568;
-  flex: 1;
+/* App toggles in modal */
+.app-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--green-tint);
+  border-radius: 8px;
+  border: 1px solid var(--green-border);
 }
+.app-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.app-toggle-info { display: flex; align-items: center; gap: 8px; }
+.app-toggle-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: var(--green-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.app-toggle-icon svg { width: 13px; height: 13px; color: var(--green); }
+.app-toggle-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.app-toggle-desc { font-size: 11px; color: var(--text-muted); }
 
 .modal-actions {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-top: 28px;
 }
-
 .modal-btn {
   flex: 1;
   padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s;
+  border: none;
+  transition: background 0.13s;
 }
+.modal-btn-primary { background: var(--green); color: #fff; }
+.modal-btn-primary:hover { background: var(--green-dark); }
+.modal-btn-secondary { background: var(--border-light); color: var(--text-mid); }
+.modal-btn-secondary:hover { background: var(--border); }
 
-.modal-btn-primary {
-  background: #2563eb;
-  color: white;
+/* ══════════════════════════════
+   TOAST NOTIFICATIONS
+══════════════════════════════ */
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
 }
-
-.modal-btn-primary:hover { background: #1d4ed8; }
-
-.modal-btn-secondary {
-  background: #e2e8f0;
-  color: #2d3748;
-}
-
-.modal-btn-secondary:hover { background: #cbd5e0; }
-
-/* Apps Config Section */
-.apps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.app-config-card {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 20px;
-  background: white;
-  transition: all 0.2s;
-}
-
-.app-config-card:hover {
-  border-color: #bfdbfe;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-}
-
-.app-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a202c;
-  margin-bottom: 8px;
+.toast {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  padding: 13px 18px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.14);
+  pointer-events: auto;
+  animation: toastIn 0.22s ease;
+  max-width: 360px;
+  border: 1px solid;
 }
-
-.app-url {
-  font-size: 12px;
-  color: #718096;
-  font-family: 'Monaco', 'Courier New', monospace;
-  background: #f7fafc;
-  padding: 8px 12px;
-  border-radius: 4px;
-  margin: 12px 0;
-  word-break: break-all;
-}
-
-.app-status {
-  font-size: 13px;
-  color: #16a34a;
-  font-weight: 600;
-  margin: 12px 0;
-}
-
-.edit-btn {
-  width: 100%;
-  padding: 8px;
-  background: #e6f2ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
-  border-radius: 6px;
+.toast.toast-success { background: #f0fdf4; color: #14532d; border-color: #bbf7d0; }
+.toast.toast-error   { background: #fef2f2; color: #7f1d1d; border-color: #fecaca; }
+.toast.toast-info    { background: var(--green-light); color: var(--green-dark); border-color: var(--green-border); }
+.toast-icon { flex-shrink: 0; }
+.toast-icon svg { width: 17px; height: 17px; }
+.toast-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s;
+  opacity: 0.5;
+  padding: 2px;
+  flex-shrink: 0;
+  color: inherit;
+}
+.toast-dismiss:hover { opacity: 1; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(20px); }
 }
 
-.edit-btn:hover { background: #dbeafe; }
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .container { flex-direction: column; }
-  .sidebar { width: 100%; position: relative; top: 0; }
-  .header { flex-direction: column; gap: 16px; }
-  .tabs { padding: 0 24px; }
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .summary-strip { grid-template-columns: repeat(2, 1fr); }
+  .access-row, .access-header-grid {
+    grid-template-columns: 160px 1fr 1fr 1fr 100px;
+  }
 }
-
+@media (max-width: 820px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .main { padding: 20px; gap: 18px; }
+  .summary-strip { grid-template-columns: repeat(2, 1fr); }
+  .page-header { flex-direction: column; align-items: flex-start; }
+  .access-row, .access-header-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <span>🚀</span>
-      <span>FI GenAI PoC</span>
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<div class="layout">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+
+    <div class="sidebar-brand">
+      <svg class="brand-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.18)"/>
+        <rect x="10" y="11" width="9" height="2.5" rx="1.25" fill="#fff"/>
+        <rect x="10" y="16.75" width="6" height="2.5" rx="1.25" fill="#fff"/>
+        <rect x="10" y="22.5" width="9" height="2.5" rx="1.25" fill="#fff"/>
+        <rect x="21" y="11" width="2.5" height="14" rx="1.25" fill="#fff"/>
+      </svg>
+      <div>
+        <div class="brand-name">FI GenAI</div>
+        <div class="brand-sub">PoC Platform</div>
+      </div>
     </div>
 
-    <div class="nav-section">
-      <span class="nav-label">Platform</span>
-      <div class="nav-item">📄 Document AI</div>
-      <div class="nav-item">📊 Data Q&A</div>
-      <div class="nav-item">📈 Report Generator</div>
-    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-label">Applications</span>
 
-    <div class="nav-section">
+      <a href="http://157.230.82.180/Document_AI/" class="nav-link" target="_blank">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        Document AI
+      </a>
+
+      <a href="http://157.230.82.180/Text_to_SQL/" class="nav-link" target="_blank">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="12" cy="5" rx="9" ry="3"/>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+        </svg>
+        Data Q&amp;A
+      </a>
+
+      <a href="http://157.230.82.180/BI_Dashboard/" class="nav-link" target="_blank">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6"  y1="20" x2="6"  y2="14"/>
+          <line x1="2"  y1="20" x2="22" y2="20"/>
+        </svg>
+        Report Generator
+      </a>
+
       <span class="nav-label">Admin</span>
-      <div class="nav-item active">⚙️ User Management</div>
-      <div class="nav-item">🔐 App Access Control</div>
-      <div class="nav-item">📊 Usage Analytics</div>
-    </div>
 
-    <div class="session-usage">
-      <span class="usage-label">Session Usage</span>
-      <div class="usage-grid">
-        <div class="usage-item">
-          <div class="usage-label-item">Active Users</div>
-          <div class="usage-value">5</div>
-        </div>
-        <div class="usage-item">
-          <div class="usage-label-item">Apps</div>
-          <div class="usage-value">3</div>
-        </div>
+      <button class="nav-link active" onclick="showSection('users')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        User Management
+      </button>
+
+      <button class="nav-link" onclick="showSection('access')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Access Control
+      </button>
+
+      <button class="nav-link" onclick="showSection('analytics')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Usage Analytics
+      </button>
+
+      <span class="nav-label">Platform</span>
+
+      <a href="/" class="nav-admin">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Back to Platform
+        <span class="admin-badge">HOME</span>
+      </a>
+    </nav>
+
+    <!-- Session Activity -->
+    <div class="sidebar-footer">
+      <div class="session-header">
+        <span class="session-title">Session Activity</span>
+        <button class="refresh-btn" title="Refresh" onclick="refreshUsage(this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+        </button>
       </div>
+
+      <div class="usage-metric">
+        <div class="usage-top">
+          <span class="usage-lbl">Active Users</span>
+          <span class="usage-val">4 / 5</span>
+        </div>
+        <div class="usage-track"><div class="usage-fill" style="width:80%"></div></div>
+      </div>
+
+      <div class="usage-metric">
+        <div class="usage-top">
+          <span class="usage-lbl">Today's Requests</span>
+          <span class="usage-val">47 / 100</span>
+        </div>
+        <div class="usage-track"><div class="usage-fill" style="width:47%"></div></div>
+      </div>
+
+      <button class="logout-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Logout
+      </button>
     </div>
+  </aside>
 
-    <button class="logout-btn">🚪 Logout</button>
-  </div>
+  <!-- ══ MAIN CONTENT ══ -->
+  <main class="main">
 
-  <!-- Main Content -->
-  <div class="main">
-    <div class="header">
+    <!-- Page Header -->
+    <div class="page-header">
       <div class="header-left">
-        <h1>⚙️ User Management</h1>
-        <p class="header-subtitle">Manage user accounts and grant access to applications</p>
+        <svg class="header-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="9" fill="#006633"/>
+          <rect x="11" y="12" width="10" height="2.5" rx="1.25" fill="#fff"/>
+          <rect x="11" y="18.75" width="7" height="2.5" rx="1.25" fill="#fff"/>
+          <rect x="11" y="25.5" width="10" height="2.5" rx="1.25" fill="#fff"/>
+          <rect x="24" y="12" width="2.5" height="16" rx="1.25" fill="#fff"/>
+        </svg>
+        <div>
+          <div class="page-title">Admin Dashboard</div>
+          <div class="header-sub">Manage users, access grants, and platform usage &mdash; FI GenAI PoC</div>
+        </div>
       </div>
-      <button class="add-user-btn" onclick="openAddUserModal()">+ Add User</button>
+      <button class="add-user-btn" onclick="openModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add User
+      </button>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab(event, 'users')">👥 Users</div>
-      <div class="tab" onclick="switchTab(event, 'apps')">📱 App Configuration</div>
-      <div class="tab" onclick="switchTab(event, 'access')">🔐 Access Control</div>
+    <!-- ══ SUMMARY STRIP ══ -->
+    <div class="summary-strip">
+      <div class="summary-card">
+        <div class="summary-icon-wrap">
+          <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <div class="summary-val">5</div>
+          <div class="summary-lbl">Total Users</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon-wrap">
+          <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div>
+          <div class="summary-val">4</div>
+          <div class="summary-lbl">Active Sessions</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon-wrap">
+          <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div>
+          <div class="summary-val">47</div>
+          <div class="summary-lbl">Requests Today</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon-wrap">
+          <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div>
+          <div class="summary-val">38.2k</div>
+          <div class="summary-lbl">Tokens Today</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Users Tab -->
-    <div id="users" class="content-section active">
+    <!-- ══ USER MANAGEMENT ══ -->
+    <div id="section-users" class="section-card">
+      <div class="section-card-header">
+        <div class="section-card-title">User Management</div>
+        <span class="section-card-meta">5 users &nbsp;&middot;&nbsp; 4 active</span>
+      </div>
+
+      <div class="table-toolbar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input class="search-input" type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()">
+        </div>
+        <select class="filter-select" id="statusFilter" onchange="filterUsers()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select class="filter-select" id="appFilter" onchange="filterUsers()">
+          <option value="">All Apps</option>
+          <option value="Document AI">Document AI</option>
+          <option value="Data Q&amp;A">Data Q&amp;A</option>
+          <option value="Report Generator">Report Generator</option>
+        </select>
+      </div>
+
       <div class="table-wrapper">
-        <table>
+        <table id="usersTable">
           <thead>
             <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Apps Assigned</th>
+              <th onclick="sortTable(0)">Username <i class="sort-icon">↕</i></th>
+              <th onclick="sortTable(1)">Email <i class="sort-icon">↕</i></th>
+              <th onclick="sortTable(2)">Last Login <i class="sort-icon">↕</i></th>
+              <th>Apps Granted</th>
+              <th onclick="sortTable(4)">Status <i class="sort-icon">↕</i></th>
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
+          <tbody id="usersBody">
+            <tr data-status="active" data-apps="Document AI,Data Q&amp;A,Report Generator">
               <td class="user-name">Platform Admin</td>
-              <td>admin@fidelity.com</td>
-              <td><span class="role-badge role-admin">Admin</span></td>
-              <td><span class="status-active">Active</span></td>
-              <td>All</td>
+              <td class="user-email">admin@fidelity.com</td>
+              <td>Today, 09:12</td>
+              <td><div class="app-chips"><span class="app-chip chip-all">All Apps</span></div></td>
+              <td><span class="status-pill status-active">Active</span></td>
               <td>
-                <button class="action-btn">Edit</button>
+                <div class="action-group">
+                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
+                </div>
               </td>
             </tr>
-            <tr>
+            <tr data-status="active" data-apps="Document AI,Data Q&amp;A">
               <td class="user-name">John Smith</td>
-              <td>john.smith@fidelity.com</td>
-              <td><span class="role-badge role-user">User</span></td>
-              <td><span class="status-active">Active</span></td>
-              <td>Document AI, Data Q&A</td>
+              <td class="user-email">john.smith@fidelity.com</td>
+              <td>Today, 08:44</td>
               <td>
-                <button class="action-btn">Edit</button>
-                <button class="action-btn delete-btn">Remove</button>
+                <div class="app-chips">
+                  <span class="app-chip chip-doc">Document AI</span>
+                  <span class="app-chip chip-data">Data Q&amp;A</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-active">Active</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
+                  <button class="act-btn act-revoke" onclick="toast('Access revoked for John Smith.','error')">Revoke</button>
+                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
+                </div>
               </td>
             </tr>
-            <tr>
+            <tr data-status="active" data-apps="Document AI,Report Generator">
               <td class="user-name">Sarah Johnson</td>
-              <td>sarah.johnson@fidelity.com</td>
-              <td><span class="role-badge role-user">User</span></td>
-              <td><span class="status-active">Active</span></td>
-              <td>Document AI, Report Generator</td>
+              <td class="user-email">sarah.johnson@fidelity.com</td>
+              <td>Yesterday, 17:03</td>
               <td>
-                <button class="action-btn">Edit</button>
-                <button class="action-btn delete-btn">Remove</button>
+                <div class="app-chips">
+                  <span class="app-chip chip-doc">Document AI</span>
+                  <span class="app-chip chip-rpt">Report Generator</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-active">Active</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
+                  <button class="act-btn act-revoke" onclick="toast('Access revoked for Sarah Johnson.','error')">Revoke</button>
+                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
+                </div>
               </td>
             </tr>
-            <tr>
+            <tr data-status="active" data-apps="Data Q&amp;A,Report Generator">
               <td class="user-name">Michael Chen</td>
-              <td>michael.chen@fidelity.com</td>
-              <td><span class="role-badge role-user">User</span></td>
-              <td><span class="status-active">Active</span></td>
-              <td>Data Q&A, Report Generator</td>
+              <td class="user-email">michael.chen@fidelity.com</td>
+              <td>Today, 10:55</td>
               <td>
-                <button class="action-btn">Edit</button>
-                <button class="action-btn delete-btn">Remove</button>
+                <div class="app-chips">
+                  <span class="app-chip chip-data">Data Q&amp;A</span>
+                  <span class="app-chip chip-rpt">Report Generator</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-active">Active</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
+                  <button class="act-btn act-revoke" onclick="toast('Access revoked for Michael Chen.','error')">Revoke</button>
+                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
+                </div>
               </td>
             </tr>
-            <tr>
+            <tr data-status="inactive" data-apps="Document AI">
               <td class="user-name">Lisa Anderson</td>
-              <td>lisa.anderson@fidelity.com</td>
-              <td><span class="role-badge role-user">User</span></td>
-              <td><span class="status-inactive">Inactive</span></td>
-              <td>Document AI</td>
+              <td class="user-email">lisa.anderson@fidelity.com</td>
+              <td>3 days ago</td>
               <td>
-                <button class="action-btn">Edit</button>
-                <button class="action-btn delete-btn">Remove</button>
+                <div class="app-chips">
+                  <span class="app-chip chip-doc">Document AI</span>
+                </div>
+              </td>
+              <td><span class="status-pill status-inactive">Inactive</span></td>
+              <td>
+                <div class="action-group">
+                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
+                  <button class="act-btn act-revoke" onclick="toast('Access revoked for Lisa Anderson.','error')">Revoke</button>
+                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -564,192 +1098,525 @@ tbody tr:hover { background: #f9fafb; }
       </div>
     </div>
 
-    <!-- Apps Tab -->
-    <div id="apps" class="content-section">
-      <h3 style="margin-bottom: 20px; color: #1a202c; font-weight: 700;">Application Configuration</h3>
-      <div class="apps-grid">
-        <div class="app-config-card">
-          <div class="app-name">📄 Document AI</div>
-          <div class="app-url">http://157.230.82.180/Document_AI/</div>
-          <div class="app-status">✓ Active</div>
-          <p style="font-size: 13px; color: #718096; margin: 12px 0;">Summarize, Q&A, and extract data from PDFs, Word docs, and text files.</p>
-          <button class="edit-btn">Configure Access</button>
+    <!-- ══ ACCESS CONTROL ══ -->
+    <div id="section-access" class="section-card" style="display:none;">
+      <div class="section-card-header">
+        <div class="section-card-title">Access Control</div>
+        <span class="section-card-meta">Toggle per-app access for each user</span>
+      </div>
+
+      <div class="access-header">
+        <div class="access-header-grid">
+          <div>User</div>
+          <div style="text-align:center;">Document AI</div>
+          <div style="text-align:center;">Data Q&amp;A</div>
+          <div style="text-align:center;">Report Generator</div>
+          <div style="text-align:center;">Save</div>
+        </div>
+      </div>
+
+      <div class="access-grid">
+
+        <div class="access-row">
+          <div class="user-name">Platform Admin<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">admin@fidelity.com</span></div>
+          <div class="toggle-cell">
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div style="text-align:center;">
+            <span style="font-size:11px;color:var(--text-muted);">Admin</span>
+          </div>
         </div>
 
-        <div class="app-config-card">
-          <div class="app-name">📊 Data Q&A</div>
-          <div class="app-url">http://157.230.82.180/Text_to_SQL/</div>
-          <div class="app-status">✓ Active</div>
-          <p style="font-size: 13px; color: #718096; margin: 12px 0;">Ask questions about databases in plain English.</p>
-          <button class="edit-btn">Configure Access</button>
+        <div class="access-row">
+          <div class="user-name">John Smith<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">john.smith@fidelity.com</span></div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state">Off</span>
+          </div>
+          <div style="text-align:center;">
+            <button class="act-btn act-edit" onclick="toast('Access updated for John Smith.','success')">Save</button>
+          </div>
         </div>
 
-        <div class="app-config-card">
-          <div class="app-name">📈 Report Generator</div>
-          <div class="app-url">http://157.230.82.180/BI_Dashboard/</div>
-          <div class="app-status">✓ Active</div>
-          <p style="font-size: 13px; color: #718096; margin: 12px 0;">Upload data and build interactive charts with AI.</p>
-          <button class="edit-btn">Configure Access</button>
+        <div class="access-row">
+          <div class="user-name">Sarah Johnson<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">sarah.johnson@fidelity.com</span></div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state">Off</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div style="text-align:center;">
+            <button class="act-btn act-edit" onclick="toast('Access updated for Sarah Johnson.','success')">Save</button>
+          </div>
         </div>
 
-        <div class="app-config-card" style="opacity: 0.6; border-style: dashed;">
-          <div class="app-name" style="color: #a0aec0;">🔮 Coming Soon</div>
-          <div style="font-size: 13px; color: #a0aec0; margin: 12px 0;">More AI-powered features in development</div>
-          <button class="edit-btn" disabled style="background: #e2e8f0; color: #a0aec0; cursor: not-allowed;">Coming Soon</button>
+        <div class="access-row">
+          <div class="user-name">Michael Chen<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">michael.chen@fidelity.com</span></div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state">Off</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div style="text-align:center;">
+            <button class="act-btn act-edit" onclick="toast('Access updated for Michael Chen.','success')">Save</button>
+          </div>
         </div>
+
+        <div class="access-row">
+          <div class="user-name">Lisa Anderson<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">lisa.anderson@fidelity.com</span></div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox" checked>
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state" style="color:var(--green);">On</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state">Off</span>
+          </div>
+          <div class="toggle-cell">
+            <label class="toggle" onchange="updateToggleLabel(this)">
+              <input type="checkbox">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
+            </label>
+            <span class="toggle-state">Off</span>
+          </div>
+          <div style="text-align:center;">
+            <button class="act-btn act-edit" onclick="toast('Access updated for Lisa Anderson.','success')">Save</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Access Control Tab -->
-    <div id="access" class="content-section">
-      <h3 style="margin-bottom: 20px; color: #1a202c; font-weight: 700;">Access Control Matrix</h3>
+    <!-- ══ USAGE ANALYTICS ══ -->
+    <div id="section-analytics" class="section-card" style="display:none;">
+      <div class="section-card-header">
+        <div class="section-card-title">Usage Analytics</div>
+        <span class="section-card-meta">Current period &mdash; May 2026</span>
+      </div>
+
       <div class="table-wrapper">
-        <table>
+        <table class="analytics-table">
           <thead>
             <tr>
               <th>User</th>
               <th>Document AI</th>
-              <th>Data Q&A</th>
+              <th>Data Q&amp;A</th>
               <th>Report Generator</th>
-              <th>Actions</th>
+              <th>Total Requests</th>
+              <th>Total Tokens</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td class="user-name">Platform Admin</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td><button class="action-btn">Edit</button></td>
+              <td>
+                <span class="token-count">12</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">8</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:40%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">5</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:25%"></div></div></div>
+              </td>
+              <td><span class="token-count">25</span></td>
+              <td><span class="token-count">18,400</span></td>
             </tr>
             <tr>
               <td class="user-name">John Smith</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Read</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Read</td>
-              <td style="color: #dc2626; font-weight: 600;">✗ None</td>
-              <td><button class="action-btn">Edit</button></td>
+              <td>
+                <span class="token-count">7</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:35%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">9</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:45%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">0</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
+              </td>
+              <td><span class="token-count">16</span></td>
+              <td><span class="token-count">9,800</span></td>
             </tr>
             <tr>
               <td class="user-name">Sarah Johnson</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td style="color: #dc2626; font-weight: 600;">✗ None</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td><button class="action-btn">Edit</button></td>
+              <td>
+                <span class="token-count">20</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">0</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">14</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div></div>
+              </td>
+              <td><span class="token-count">34</span></td>
+              <td><span class="token-count">24,100</span></td>
             </tr>
             <tr>
               <td class="user-name">Michael Chen</td>
-              <td style="color: #dc2626; font-weight: 600;">✗ None</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Full</td>
-              <td><button class="action-btn">Edit</button></td>
+              <td>
+                <span class="token-count">0</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">18</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:90%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">11</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:55%"></div></div></div>
+              </td>
+              <td><span class="token-count">29</span></td>
+              <td><span class="token-count">19,650</span></td>
             </tr>
             <tr>
               <td class="user-name">Lisa Anderson</td>
-              <td style="color: #16a34a; font-weight: 600;">✓ Read</td>
-              <td style="color: #dc2626; font-weight: 600;">✗ None</td>
-              <td style="color: #dc2626; font-weight: 600;">✗ None</td>
-              <td><button class="action-btn">Edit</button></td>
+              <td>
+                <span class="token-count">3</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:15%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">0</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
+              </td>
+              <td>
+                <span class="token-count">0</span>
+                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
+              </td>
+              <td><span class="token-count">3</span></td>
+              <td><span class="token-count">2,100</span></td>
+            </tr>
+            <tr style="background:var(--green-tint);font-weight:700;">
+              <td style="color:var(--green);font-weight:700;">Total</td>
+              <td><span class="token-count">42</span></td>
+              <td><span class="token-count">35</span></td>
+              <td><span class="token-count">30</span></td>
+              <td><span class="token-count">107</span></td>
+              <td><span class="token-count">74,050</span></td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-  </div>
+
+  </main>
 </div>
 
-<!-- Add User Modal -->
+<!-- ══ ADD USER MODAL ══ -->
 <div id="addUserModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">Add New User</div>
-    
+  <div class="modal-box">
+    <div class="modal-title">
+      <div class="modal-title-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="8.5" cy="7" r="4"/>
+          <line x1="20" y1="8" x2="20" y2="14"/>
+          <line x1="23" y1="11" x2="17" y2="11"/>
+        </svg>
+      </div>
+      Add New User
+    </div>
+
     <div class="form-group">
       <label class="form-label">Full Name</label>
-      <input type="text" class="form-input" placeholder="e.g., Jane Doe">
+      <input type="text" class="form-input" id="newUserName" placeholder="e.g., Jane Doe">
     </div>
 
     <div class="form-group">
       <label class="form-label">Email Address</label>
-      <input type="email" class="form-input" placeholder="jane.doe@fidelity.com">
+      <input type="email" class="form-input" id="newUserEmail" placeholder="jane.doe@fidelity.com">
     </div>
 
     <div class="form-group">
       <label class="form-label">Role</label>
-      <select class="form-input" id="roleSelect" onchange="updateAppAccess()">
-        <option value="user">User (Limited Access)</option>
+      <select class="form-input" id="newUserRole" onchange="handleRoleChange()">
+        <option value="user">User</option>
         <option value="admin">Admin (Full Access)</option>
       </select>
     </div>
 
     <div class="form-group">
-      <label class="form-label">Grant Access To Apps</label>
-      <div class="checkbox-group">
-        <div class="checkbox-item">
-          <input type="checkbox" id="app1" class="app-checkbox">
-          <label for="app1">📄 Document AI</label>
+      <label class="form-label">App Access</label>
+      <div class="app-toggles" id="appToggles">
+        <div class="app-toggle-row">
+          <div class="app-toggle-info">
+            <div class="app-toggle-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div>
+              <div class="app-toggle-name">Document AI</div>
+              <div class="app-toggle-desc">PDF &amp; document Q&amp;A</div>
+            </div>
+          </div>
+          <label class="toggle" onchange="updateToggleLabel(this)">
+            <input type="checkbox" class="modal-app-cb">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
         </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="app2" class="app-checkbox">
-          <label for="app2">📊 Data Q&A</label>
+
+        <div class="app-toggle-row">
+          <div class="app-toggle-info">
+            <div class="app-toggle-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              </svg>
+            </div>
+            <div>
+              <div class="app-toggle-name">Data Q&amp;A</div>
+              <div class="app-toggle-desc">Natural language to SQL</div>
+            </div>
+          </div>
+          <label class="toggle" onchange="updateToggleLabel(this)">
+            <input type="checkbox" class="modal-app-cb">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
         </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="app3" class="app-checkbox">
-          <label for="app3">📈 Report Generator</label>
+
+        <div class="app-toggle-row">
+          <div class="app-toggle-info">
+            <div class="app-toggle-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6"  y1="20" x2="6"  y2="14"/>
+                <line x1="2"  y1="20" x2="22" y2="20"/>
+              </svg>
+            </div>
+            <div>
+              <div class="app-toggle-name">Report Generator</div>
+              <div class="app-toggle-desc">AI-assisted BI reports</div>
+            </div>
+          </div>
+          <label class="toggle" onchange="updateToggleLabel(this)">
+            <input type="checkbox" class="modal-app-cb">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
         </div>
       </div>
     </div>
 
     <div class="modal-actions">
       <button class="modal-btn modal-btn-primary" onclick="saveUser()">Add User</button>
-      <button class="modal-btn modal-btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
-function openAddUserModal() {
+/* ── Navigation ── */
+function showSection(name) {
+  ['users','access','analytics'].forEach(s => {
+    document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+/* ── Sidebar refresh spin ── */
+function refreshUsage(btn) {
+  btn.style.transition = 'transform 0.5s ease';
+  btn.style.transform = 'rotate(360deg)';
+  setTimeout(function() { btn.style.transition = ''; btn.style.transform = ''; }, 550);
+}
+
+/* ── Toast ── */
+function toast(message, type) {
+  type = type || 'success';
+  var icons = {
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+  };
+  var el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.innerHTML = '<span class="toast-icon">' + icons[type] + '</span><span>' + message + '</span><button class="toast-dismiss" onclick="dismissToast(this.parentElement)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(function() { dismissToast(el); }, 4000);
+}
+
+function dismissToast(el) {
+  if (!el || !el.parentElement) return;
+  el.style.animation = 'toastOut 0.2s ease forwards';
+  setTimeout(function() { if (el.parentElement) el.parentElement.removeChild(el); }, 220);
+}
+
+/* ── Modal ── */
+function openModal() {
   document.getElementById('addUserModal').classList.add('active');
 }
-
-function closeAddUserModal() {
+function closeModal() {
   document.getElementById('addUserModal').classList.remove('active');
 }
+document.getElementById('addUserModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 
-function switchTab(e, tabName) {
-  // Remove active class from all tabs and sections
-  document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-  document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
-  
-  // Add active class to clicked tab and corresponding section
-  e.target.classList.add('active');
-  document.getElementById(tabName).classList.add('active');
-}
-
-function updateAppAccess() {
-  const role = document.getElementById('roleSelect').value;
-  const checkboxes = document.querySelectorAll('.app-checkbox');
-  
-  if (role === 'admin') {
-    checkboxes.forEach(cb => {
-      cb.checked = true;
-      cb.disabled = true;
-    });
-  } else {
-    checkboxes.forEach(cb => cb.disabled = false);
-  }
+function handleRoleChange() {
+  var isAdmin = document.getElementById('newUserRole').value === 'admin';
+  document.querySelectorAll('.modal-app-cb').forEach(function(cb) {
+    cb.checked = isAdmin;
+    cb.disabled = isAdmin;
+  });
 }
 
 function saveUser() {
-  alert('User would be saved with selected permissions. In production, this would call your backend API.');
-  closeAddUserModal();
+  var name = document.getElementById('newUserName').value.trim();
+  if (!name) { toast('Please enter a name.', 'error'); return; }
+  toast('User "' + name + '" added successfully.', 'success');
+  closeModal();
+  document.getElementById('newUserName').value = '';
+  document.getElementById('newUserEmail').value = '';
 }
 
-// Close modal when clicking outside
-document.getElementById('addUserModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeAddUserModal();
+/* ── Toggle label sync ── */
+function updateToggleLabel(label) {
+  var cb = label.querySelector('input');
+  var state = label.parentElement.querySelector('.toggle-state');
+  if (!state) return;
+  if (cb.checked) {
+    state.textContent = 'On';
+    state.style.color = 'var(--green)';
+  } else {
+    state.textContent = 'Off';
+    state.style.color = '';
   }
-});
-</script>
+}
 
+/* ── Search / Filter ── */
+function filterUsers() {
+  var q = document.getElementById('userSearch').value.toLowerCase();
+  var status = document.getElementById('statusFilter').value;
+  var app = document.getElementById('appFilter').value;
+  document.querySelectorAll('#usersBody tr').forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    var rowStatus = row.dataset.status || '';
+    var rowApps = row.dataset.apps || '';
+    var matchQ = !q || text.indexOf(q) !== -1;
+    var matchStatus = !status || rowStatus === status;
+    var matchApp = !app || rowApps.indexOf(app) !== -1;
+    row.style.display = (matchQ && matchStatus && matchApp) ? '' : 'none';
+  });
+}
+
+/* ── Sort ── */
+var sortCol = -1, sortAsc = true;
+function sortTable(col) {
+  var tbody = document.getElementById('usersBody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+  rows.sort(function(a, b) {
+    var at = a.cells[col] ? a.cells[col].textContent.trim() : '';
+    var bt = b.cells[col] ? b.cells[col].textContent.trim() : '';
+    return sortAsc ? at.localeCompare(bt) : bt.localeCompare(at);
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+  document.querySelectorAll('th').forEach(function(th, i) {
+    th.classList.remove('sort-asc','sort-desc');
+    if (i === col) th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+  });
+}
+</script>
 </body>
 </html>
