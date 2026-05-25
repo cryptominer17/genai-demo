@@ -80,12 +80,19 @@ done
 # ── Step 8: Health checks ────────────────────────────────────────────────────
 log "Running health checks..."
 
+declare -A HEALTH_PATHS=(
+  [8501]="/Document_AI/"
+  [8502]="/Text_to_SQL/"
+  [8503]="/BI_Dashboard/"
+)
+
 for port in 8501 8502 8503; do
-  log "Checking http://localhost:$port/ ..."
-  if curl --silent --fail --max-time 10 "http://localhost:$port/" > /dev/null; then
+  path="${HEALTH_PATHS[$port]}"
+  log "Checking http://localhost:$port$path ..."
+  if curl --silent --fail --max-time 30 "http://localhost:$port$path" > /dev/null; then
     log "Port $port: OK"
   else
-    notify_failure "Health check failed for port $port"
+    notify_failure "Health check failed for port $port ($path)"
     exit 1
   fi
 done
