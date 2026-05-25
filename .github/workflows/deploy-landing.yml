@@ -1,0 +1,104 @@
+name: Deploy Landing & Admin Pages
+
+# Triggers when landing, admin, or nginx config changes on main branch
+# Also has a manual trigger button in the GitHub Actions UI
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'landing/**'
+      - 'admin/**'
+      - 'deployment/nginx.conf'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to DigitalOcean Droplet
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ───────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up SSH ─────────────────────────────────────────────────────
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      # ── 3. Create remote directories ─────────────────────────────────────
+      - name: Create remote directories
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} \
+              "mkdir -p /var/www/fi-genai-poc/landing /var/www/fi-genai-poc/admin"
+
+      # ── 4. Upload landing page ────────────────────────────────────────────
+      - name: Upload landing page
+        run: |
+          scp -i ~/.ssh/deploy_key \
+              landing/index.html \
+              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:/var/www/fi-genai-poc/landing/index.html
+
+      # ── 5. Upload admin panel ─────────────────────────────────────────────
+      - name: Upload admin panel
+        run: |
+          scp -i ~/.ssh/deploy_key \
+              admin/index.html \
+              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:/var/www/fi-genai-poc/admin/index.html
+
+      # ── 6. Deploy nginx config + reload (zero downtime) ───────────────────
+      - name: Update nginx config and reload
+        run: |
+          scp -i ~/.ssh/deploy_key \
+              deployment/nginx.conf \
+              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:/tmp/fi-genai-poc.nginx
+
+          ssh -i ~/.ssh/deploy_key \
+              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} << 'ENDSSH'
+            # Backup existing config
+            cp /etc/nginx/sites-available/fi-genai-poc \
+               /etc/nginx/sites-available/fi-genai-poc.bak
+
+            # Install new config
+            cp /tmp/fi-genai-poc.nginx /etc/nginx/sites-available/fi-genai-poc
+
+            # Test — rollback automatically if invalid
+            nginx -t || {
+              echo "nginx config invalid — rolling back"
+              cp /etc/nginx/sites-available/fi-genai-poc.bak \
+                 /etc/nginx/sites-available/fi-genai-poc
+              exit 1
+            }
+
+            # Zero-downtime reload
+            systemctl reload nginx
+          ENDSSH
+
+      # ── 7. Smoke test ─────────────────────────────────────────────────────
+      - name: Verify deployment
+        run: |
+          sleep 3
+          LANDING=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.DROPLET_IP }}/)
+          ADMIN=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.DROPLET_IP }}/admin/)
+          DOCAI=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.DROPLET_IP }}/Document_AI/)
+
+          echo "Landing:  $LANDING"
+          echo "Admin:    $ADMIN"
+          echo "Doc AI:   $DOCAI"
+
+          if [ "$LANDING" != "200" ]; then
+            echo "ERROR: Landing page returned $LANDING"
+            exit 1
+          fi
+          echo "✅ All checks passed"
+
+# ── Required GitHub Secrets ───────────────────────────────────────────────────
+# GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+#
+#   DROPLET_IP       →  157.230.82.180
+#   DROPLET_USER     →  root
+#   DROPLET_SSH_KEY  →  (full contents of your ~/.ssh/id_rsa private key)

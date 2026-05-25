@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FI GenAI PoC Platform</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif; background: #f5f7fa; color: #333; }
+.container { display: flex; gap: 24px; max-width: 1600px; margin: 0 auto; padding: 24px; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 280px; background: white; border-radius: 8px; padding: 24px; display: flex; flex-direction: column; height: fit-content; position: sticky; top: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
+.logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 800; }
+.logo-text { font-size: 15px; font-weight: 700; color: #1a202c; line-height: 1.2; }
+.logo-sub { font-size: 11px; color: #718096; font-weight: 400; }
+.nav-label { font-size: 10px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.8px; padding: 14px 0 6px 0; display: block; }
+.nav-item { padding: 10px 12px; margin: 2px 0; border-radius: 6px; cursor: pointer; font-size: 14px; color: #4a5568; transition: all 0.15s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.nav-item:hover { background: #f7fafc; color: #1a202c; }
+.nav-item.active { background: #eff6ff; color: #2563eb; border-left-color: #2563eb; font-weight: 600; }
+.nav-item.admin-link { color: #92400e; background: #fffbeb; border-left-color: #f59e0b; margin-top: 8px; }
+.nav-item.admin-link:hover { background: #fef3c7; }
+.admin-pill { margin-left: auto; background: #dc2626; color: white; padding: 1px 7px; border-radius: 10px; font-size: 9px; font-weight: 700; }
+.sidebar-footer { margin-top: 32px; padding-top: 20px; border-top: 1px solid #e2e8f0; }
+.usage-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.usage-item { text-align: center; }
+.usage-lbl { font-size: 11px; color: #a0aec0; margin-bottom: 3px; }
+.usage-val { font-size: 20px; font-weight: 700; color: #1a202c; }
+.logout-btn { width: 100%; padding: 9px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; font-size: 13px; color: #4a5568; transition: all 0.15s; font-weight: 500; }
+.logout-btn:hover { background: #f7fafc; border-color: #cbd5e0; }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+.header { background: white; padding: 32px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+.header h1 { font-size: 26px; color: #1a202c; font-weight: 800; letter-spacing: -0.5px; }
+.header-subtitle { color: #718096; font-size: 14px; margin-bottom: 16px; }
+.warning-banner { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 11px 16px; border-radius: 6px; color: #92400e; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+
+/* Cards */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.section-title { font-size: 15px; font-weight: 700; color: #1a202c; }
+.section-count { font-size: 13px; color: #718096; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+
+.feature-card { background: white; border-radius: 8px; padding: 24px; transition: all 0.2s; cursor: pointer; border: 1px solid #e2e8f0; position: relative; overflow: hidden; text-decoration: none; display: block; }
+.feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #2563eb, #7c3aed); opacity: 0; transition: opacity 0.2s; }
+.feature-card:hover { box-shadow: 0 6px 20px rgba(37,99,235,0.1); transform: translateY(-2px); border-color: #bfdbfe; }
+.feature-card:hover::before { opacity: 1; }
+.feature-card.coming-soon { opacity: 0.55; cursor: default; border-style: dashed; }
+.feature-card.coming-soon:hover { transform: none; box-shadow: none; border-color: #e2e8f0; }
+.feature-card.coming-soon:hover::before { opacity: 0; }
+
+.card-icon-wrap { width: 40px; height: 40px; background: #eff6ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; margin-bottom: 14px; }
+.card-title { font-size: 16px; color: #1e40af; font-weight: 700; margin-bottom: 8px; }
+.card-desc { color: #4a5568; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.access-tag { display: inline-flex; align-items: center; gap: 5px; color: #15803d; font-size: 12px; font-weight: 600; }
+.access-tag::before { content: '✓ '; font-weight: 800; }
+.coming-tag { color: #9ca3af; font-size: 12px; font-weight: 600; }
+.launch-arrow { color: #93c5fd; font-size: 16px; transition: all 0.2s; }
+.feature-card:hover .launch-arrow { color: #2563eb; transform: translateX(3px); }
+
+/* Admin Banner */
+.admin-card-wide { background: linear-gradient(135deg, #1e3a5f 0%, #1e1b4b 100%); border-radius: 8px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.admin-card-text h3 { font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
+.admin-card-text p { font-size: 13px; color: #93c5fd; }
+.admin-enter-btn { padding: 10px 24px; background: white; color: #1e3a5f; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
+.admin-enter-btn:hover { background: #eff6ff; transform: translateY(-1px); }
+
+@media (max-width: 1024px) {
+  .container { flex-direction: column; }
+  .sidebar { width: 100%; position: relative; top: 0; }
+  .features-grid { grid-template-columns: 1fr; }
+  .admin-card-wide { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">FI</div>
+      <div>
+        <div class="logo-text">FI GenAI</div>
+        <div class="logo-sub">PoC Platform</div>
+      </div>
+    </div>
+
+    <span class="nav-label">Applications</span>
+    <a href="http://157.230.82.180/Document_AI/" class="nav-item active" target="_blank">📄 Document AI</a>
+    <a href="http://157.230.82.180/Text_to_SQL/" class="nav-item" target="_blank">📊 Data Q&A</a>
+    <a href="http://157.230.82.180/BI_Dashboard/" class="nav-item" target="_blank">📈 Report Generator</a>
+
+    <span class="nav-label">Admin</span>
+    <a href="/admin/" class="nav-item admin-link">⚙️ Admin Panel <span class="admin-pill">ADMIN</span></a>
+
+    <div class="sidebar-footer">
+      <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Session Usage</div>
+      <div class="usage-row">
+        <div class="usage-item"><div class="usage-lbl">Requests</div><div class="usage-val">0</div></div>
+        <div class="usage-item"><div class="usage-lbl">Tokens</div><div class="usage-val">0</div></div>
+      </div>
+      <button class="logout-btn">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="header">
+      <div class="header-top">
+        <span style="font-size:34px;">🚀</span>
+        <h1>FI GenAI PoC Platform</h1>
+      </div>
+      <p class="header-subtitle">Welcome back, <strong>Platform Admin</strong>. Select a feature below or from the sidebar to launch an app.</p>
+      <div class="warning-banner">⚠️ &nbsp;You must change your password before using the platform.</div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div>
+      <div class="section-header">
+        <span class="section-title">Available Features</span>
+        <span class="section-count">3 active &nbsp;·&nbsp; 1 coming soon</span>
+      </div>
+      <div class="features-grid">
+
+        <a href="http://157.230.82.180/Document_AI/" class="feature-card" target="_blank">
+          <div class="card-icon-wrap">📄</div>
+          <div class="card-title">Document AI</div>
+          <p class="card-desc">Upload PDFs, Word docs, and text files. Ask natural-language questions and get instant summaries and data extraction powered by Claude.</p>
+          <div class="card-footer"><span class="access-tag">Access granted</span><span class="launch-arrow">→</span></div>
+        </a>
+
+        <a href="http://157.230.82.180/Text_to_SQL/" class="feature-card" target="_blank">
+          <div class="card-icon-wrap">📊</div>
+          <div class="card-title">Data Q&A</div>
+          <p class="card-desc">Ask questions about structured data in plain English. Claude translates your query to SQL, runs it, and explains the results instantly.</p>
+          <div class="card-footer"><span class="access-tag">Access granted</span><span class="launch-arrow">→</span></div>
+        </a>
+
+        <a href="http://157.230.82.180/BI_Dashboard/" class="feature-card" target="_blank">
+          <div class="card-icon-wrap">📈</div>
+          <div class="card-title">Report Generator</div>
+          <p class="card-desc">Upload CSV or Excel data. AI builds interactive charts and generates executive-ready narrative commentary for your reports.</p>
+          <div class="card-footer"><span class="access-tag">Access granted</span><span class="launch-arrow">→</span></div>
+        </a>
+
+        <div class="feature-card coming-soon">
+          <div class="card-icon-wrap" style="background:#f9fafb;">🔮</div>
+          <div class="card-title" style="color:#9ca3af;">More Apps</div>
+          <p class="card-desc" style="color:#9ca3af;">Additional AI-powered tools are in development. Check back for upcoming releases from the AI Platform team.</p>
+          <div class="card-footer"><span class="coming-tag">Coming soon</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Admin Banner -->
+    <div class="admin-card-wide">
+      <div class="admin-card-text">
+        <h3>⚙️ Admin Dashboard</h3>
+        <p>Manage users, grant per-app access, and view platform usage analytics.</p>
+      </div>
+      <button class="admin-enter-btn" onclick="window.location.href='/admin/'">Enter Admin →</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
