@@ -34,7 +34,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key \
               ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} \
-              "mkdir -p /var/www/fi-genai-poc/landing /var/www/fi-genai-poc/admin"
+              "sudo mkdir -p /var/www/fi-genai-poc/landing /var/www/fi-genai-poc/admin && sudo chown -R ${{ secrets.DROPLET_USER }}:${{ secrets.DROPLET_USER }} /var/www/fi-genai-poc"
 
       # ── 4. Upload landing page ────────────────────────────────────────────
       - name: Upload landing page
@@ -67,15 +67,15 @@ jobs:
             cp /tmp/fi-genai-poc.nginx /etc/nginx/sites-available/fi-genai-poc
 
             # Test — rollback automatically if invalid
-            nginx -t || {
+            sudo nginx -t || {
               echo "nginx config invalid — rolling back"
-              cp /etc/nginx/sites-available/fi-genai-poc.bak \
+              sudo cp /etc/nginx/sites-available/fi-genai-poc.bak \
                  /etc/nginx/sites-available/fi-genai-poc
               exit 1
             }
 
             # Zero-downtime reload
-            systemctl reload nginx
+            sudo systemctl reload nginx
           ENDSSH
 
       # ── 7. Smoke test ─────────────────────────────────────────────────────
@@ -100,5 +100,5 @@ jobs:
 # GitHub repo → Settings → Secrets and variables → Actions → New repository secret
 #
 #   DROPLET_IP       →  157.230.82.180
-#   DROPLET_USER     →  root
-#   DROPLET_SSH_KEY  →  (full contents of your ~/.ssh/id_rsa private key)
+#   DROPLET_USER     →  streamlit
+#   DROPLET_SSH_KEY  →  (full contents of /home/streamlit/.ssh/id_ed25519 on the droplet)
