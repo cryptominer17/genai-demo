@@ -81,7 +81,7 @@ with st.sidebar:
     st.header("Document Intelligence")
     st.markdown(
         "AI-powered analysis of contracts, policies, financial documents, and more. "
-        "Powered by Claude claude-3-haiku-20240307."
+        "Powered by Claude claude-haiku-4-5-20251001."
     )
     st.divider()
 

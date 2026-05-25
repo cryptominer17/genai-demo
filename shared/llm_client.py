@@ -25,7 +25,7 @@ class LLMClient:
     query methods that handle common error cases uniformly.
     """
 
-    DEFAULT_MODEL = "claude-3-haiku-20240307"
+    DEFAULT_MODEL = "claude-haiku-4-5-20251001"
 
     def __init__(self) -> None:
         """

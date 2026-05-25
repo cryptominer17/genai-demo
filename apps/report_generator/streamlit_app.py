@@ -53,7 +53,7 @@ with header_left:
     st.title("📈 Report Generator")
     st.markdown(
         "AI-generated business intelligence reports tailored to your audience, "
-        "backed by live BI data. Powered by Claude claude-3-haiku-20240307."
+        "backed by live BI data. Powered by Claude claude-haiku-4-5-20251001."
     )
 with header_right:
     st.write("")
