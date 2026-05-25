@@ -60,10 +60,11 @@ check_port() {
     local port="$1"
     local label="$2"
     local name="$3"
+    local path="$4"
     local http_code
-    http_code=$(curl --silent --fail --max-time 10 \
+    http_code=$(curl --silent --max-time 10 \
         --write-out "%{http_code}" --output /dev/null \
-        "http://localhost:${port}" 2>/dev/null || echo "000")
+        "http://localhost:${port}${path}" 2>/dev/null || echo "000")
 
     if [[ "$http_code" =~ ^(200|301|302|303|307|308)$ ]]; then
         ok "Port $port ($name) — HTTP $http_code" "$label"
@@ -72,9 +73,9 @@ check_port() {
     fi
 }
 
-check_port 8501 "port_8501" "Document Intelligence"
-check_port 8502 "port_8502" "Data Q&A"
-check_port 8503 "port_8503" "Report Generator"
+check_port 8501 "port_8501" "Document Intelligence" "/Document_AI/"
+check_port 8502 "port_8502" "Data Q&A"              "/Text_to_SQL/"
+check_port 8503 "port_8503" "Report Generator"      "/BI_Dashboard/"
 
 # ------------------------------------------------------------------ #
 # 3. Nginx
@@ -88,10 +89,10 @@ else
     fail "nginx is NOT active (run: systemctl status nginx)" "nginx_service"
 fi
 
-if nginx -t 2>/dev/null; then
+if sudo nginx -t 2>/dev/null; then
     ok "nginx config test passed" "nginx_config"
 else
-    fail "nginx config test FAILED (run: nginx -t)" "nginx_config"
+    fail "nginx config test FAILED (run: sudo nginx -t)" "nginx_config"
 fi
 
 # ------------------------------------------------------------------ #
