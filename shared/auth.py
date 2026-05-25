@@ -90,7 +90,7 @@ def require_login(authenticator: stauth.Authenticate) -> tuple[str, str]:
     Returns:
         A tuple of (display_name, username) for the authenticated user.
     """
-    name, auth_status, username = authenticator.login(location="main")
+    name, auth_status, username = authenticator.login("Login", location="main")
 
     if auth_status is False:
         st.error("Username/password is incorrect")
