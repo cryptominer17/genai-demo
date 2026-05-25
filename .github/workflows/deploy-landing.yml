@@ -51,32 +51,18 @@ jobs:
               ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:/var/www/fi-genai-poc/admin/index.html
 
       # ── 6. Deploy nginx config + reload (zero downtime) ───────────────────
-      - name: Update nginx config and reload
+      - name: Upload nginx config
         run: |
           scp -i ~/.ssh/deploy_key \
               deployment/nginx.conf \
               ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:/tmp/fi-genai-poc.nginx
 
+      - name: Install and reload nginx config
+        run: |
           ssh -i ~/.ssh/deploy_key \
-              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} << 'ENDSSH'
-            # Backup existing config
-            cp /etc/nginx/sites-available/fi-genai-poc \
-               /etc/nginx/sites-available/fi-genai-poc.bak
-
-            # Install new config
-            cp /tmp/fi-genai-poc.nginx /etc/nginx/sites-available/fi-genai-poc
-
-            # Test — rollback automatically if invalid
-            sudo nginx -t || {
-              echo "nginx config invalid — rolling back"
-              sudo cp /etc/nginx/sites-available/fi-genai-poc.bak \
-                 /etc/nginx/sites-available/fi-genai-poc
-              exit 1
-            }
-
-            # Zero-downtime reload
-            sudo systemctl reload nginx
-          ENDSSH
+              -o StrictHostKeyChecking=accept-new \
+              ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} \
+              "sudo cp /etc/nginx/sites-available/fi-genai-poc /etc/nginx/sites-available/fi-genai-poc.bak && sudo cp /tmp/fi-genai-poc.nginx /etc/nginx/sites-available/fi-genai-poc && sudo nginx -t && sudo systemctl reload nginx"
 
       # ── 7. Smoke test ─────────────────────────────────────────────────────
       - name: Verify deployment
