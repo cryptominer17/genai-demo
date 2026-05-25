@@ -77,7 +77,7 @@ DATASETS = {
         ],
     },
     "Product Inventory": {
-        "filename": "product_inventory.csv",
+        "filename": "product_inventory_realtime.csv",
         "description": (
             "Current inventory snapshot with product ID, category, stock levels, "
             "reorder threshold, unit cost, and warehouse location."

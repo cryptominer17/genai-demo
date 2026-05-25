@@ -2,15 +2,15 @@
   "report_period": "Q1 2024",
   "report_date": "2024-03-31",
   "company": "Fidelity Institutional",
-  "kpis": {
-    "revenue": {"total": 15750000, "ytd": 15750000, "target": 16000000, "variance": -250000, "variance_pct": -1.56, "yoy_growth": 0.12, "trend": "flat"},
-    "new_customers": {"count": 12, "arr_value": 580000, "target": 15, "variance": -3, "avg_deal_size": 48333, "trend": "down"},
-    "customer_retention": {"rate": 0.96, "target": 0.97, "variance": -0.01, "churn_customers": 4, "churn_arr": 248000, "nrr": 1.035, "trend": "up"},
-    "arr": {"total": 62300000, "new": 580000, "expansion": 340000, "churn": -248000, "net_new_arr": 672000, "net_arr_growth_rate": 0.0109, "trend": "up"},
-    "gross_margin": {"rate": 0.78, "target": 0.80, "variance": -0.02, "cogs": 3465000, "gross_profit": 12285000, "trend": "flat"},
-    "sales_efficiency": {"ratio": 1.45, "target": 1.3, "variance": 0.15, "cac": 42000, "ltv": 315000, "ltv_cac_ratio": 7.5, "payback_months": 18, "trend": "improving"},
-    "product_adoption": {"dau": 1240, "mau": 3800, "dau_mau_ratio": 0.327, "feature_adoption_rate": 0.62, "trend": "up"}
-  },
+  "kpis": [
+    {"name": "Revenue ($M)",        "actual": 15.75, "target": 16.00, "unit": "$M"},
+    {"name": "New Customers",       "actual": 12,    "target": 15,    "unit": "customers"},
+    {"name": "Client Retention",    "actual": 96.0,  "target": 97.0,  "unit": "%"},
+    {"name": "ARR ($M)",            "actual": 62.3,  "target": 63.0,  "unit": "$M"},
+    {"name": "Gross Margin",        "actual": 78.0,  "target": 80.0,  "unit": "%"},
+    {"name": "Sales Efficiency",    "actual": 1.45,  "target": 1.30,  "unit": "ratio"},
+    {"name": "DAU/MAU Ratio",       "actual": 32.7,  "target": 35.0,  "unit": "%"}
+  ],
   "highlights": [
     "ARR grew 1.1% QoQ reaching $62.3M with strong expansion revenue of $340K",
     "Net Revenue Retention of 103.5% demonstrates healthy customer base growth",
@@ -22,9 +22,9 @@
     "4 customers churned in Q1 representing $248K ARR; Healthcare segment showing elevated churn"
   ],
   "prior_quarter_comparison": {
-    "revenue": {"q4_2023": 16200000, "change": -450000, "change_pct": -2.78},
-    "arr": {"q4_2023": 61628000, "change": 672000, "change_pct": 1.09},
-    "new_customers": {"q4_2023": 18, "change": -6},
-    "retention": {"q4_2023": 0.97, "change": -0.01}
+    "revenue":       {"q4_2023": 16.20, "change": -0.45, "change_pct": -2.78},
+    "arr":           {"q4_2023": 61.63, "change": 0.67,  "change_pct": 1.09},
+    "new_customers": {"q4_2023": 18,    "change": -6},
+    "retention":     {"q4_2023": 0.97,  "change": -0.01}
   }
 }
