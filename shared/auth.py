@@ -1,9 +1,9 @@
 """
 auth.py — Streamlit authentication helpers for the PoC Platform.
 
-Wraps streamlit-authenticator to provide a consistent login gate across
-all apps in this deployment. Credentials are sourced from Config so no
-secrets are hard-coded here.
+Simple session-state-based login gate. No external cookie libraries —
+avoids compatibility issues between streamlit-authenticator, extra-
+streamlit-components, and Streamlit 1.31.x.
 
 Usage:
     from shared.auth import setup_authenticator, require_login
@@ -14,91 +14,100 @@ Usage:
 """
 
 import streamlit as st
-import streamlit_authenticator as stauth
 
 from shared.config import Config
 
 
-def get_auth_config() -> dict:
+class SimpleAuthenticator:
     """
-    Build the credentials dictionary expected by streamlit-authenticator.
-
-    Hashes the plain-text password from Config using stauth.Hasher so the
-    raw password is never held in memory longer than necessary.
-
-    Returns:
-        A dict in the format::
-
-            {
-                "usernames": {
-                    "<username>": {
-                        "name": "<username>",
-                        "password": "<bcrypt-hash>",
-                        "email": ""
-                    }
-                }
-            }
+    Lightweight authenticator that uses Streamlit session state.
+    Provides the same login/logout API as streamlit-authenticator
+    so app code does not need to change.
     """
-    username = Config.STREAMLIT_USERNAME
-    password = Config.STREAMLIT_PASSWORD
 
-    hashed_password = stauth.Hasher([password]).generate()[0]
+    def logout(self, button_name: str, location: str = "main", key: str = None):
+        """
+        Renders a logout button. Clears session state when clicked.
 
-    credentials = {
-        "usernames": {
-            username: {
-                "name": username,
-                "password": hashed_password,
-                "email": "",
-            }
-        }
-    }
-    return credentials
+        Parameters
+        ----------
+        button_name: str
+            Label shown on the button.
+        location: str
+            "main" or "sidebar".
+        key: str
+            Optional Streamlit widget key.
+        """
+        if location == "sidebar":
+            clicked = st.sidebar.button(button_name, key=key)
+        else:
+            clicked = st.button(button_name, key=key)
+
+        if clicked:
+            st.session_state["authenticated"] = False
+            st.session_state["username"] = None
+            st.session_state["name"] = None
+            st.rerun()
 
 
-def setup_authenticator() -> stauth.Authenticate:
+def setup_authenticator() -> SimpleAuthenticator:
     """
-    Create and return a configured streamlit-authenticator instance.
+    Create and return a SimpleAuthenticator instance.
 
-    The cookie name and signing key are fixed for this deployment.
-    Cookie expiry is set to 7 days so users stay logged in across
-    browser restarts within a week.
-
-    Returns:
-        A ready-to-use `stauth.Authenticate` object.
+    Returns
+    -------
+    SimpleAuthenticator
     """
-    credentials = get_auth_config()
-    authenticator = stauth.Authenticate(
-        credentials=credentials,
-        cookie_name="fi_poc_cookie",
-        key="fi_poc_key",
-        cookie_expiry_days=7,
-    )
-    return authenticator
+    return SimpleAuthenticator()
 
 
-def require_login(authenticator: stauth.Authenticate) -> tuple[str, str]:
+def require_login(authenticator: SimpleAuthenticator) -> tuple[str, str]:
     """
     Render the login form and enforce authentication.
 
-    Halts execution (via `st.stop()`) if the user is not logged in,
+    Halts execution (via st.stop()) if the user is not logged in,
     so any code after this call only runs for authenticated users.
 
-    Args:
-        authenticator: The authenticator returned by `setup_authenticator()`.
+    Parameters
+    ----------
+    authenticator: SimpleAuthenticator
+        The authenticator returned by setup_authenticator().
 
-    Returns:
-        A tuple of (display_name, username) for the authenticated user.
+    Returns
+    -------
+    tuple[str, str]
+        (display_name, username) for the authenticated user.
     """
-    name, auth_status, username = authenticator.login("Login", location="main")
+    # Initialise session state keys on first run
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
+    if "username" not in st.session_state:
+        st.session_state["username"] = None
+    if "name" not in st.session_state:
+        st.session_state["name"] = None
 
-    if auth_status is False:
-        st.error("Username/password is incorrect")
-        st.stop()
+    # Already logged in — return immediately
+    if st.session_state["authenticated"]:
+        return st.session_state["name"], st.session_state["username"]
 
-    if auth_status is None:
-        st.warning("Please enter your credentials")
-        st.stop()
+    # Show login form
+    st.title("Login")
+    with st.form("login_form"):
+        username_input = st.text_input("Username")
+        password_input = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Login")
 
-    # auth_status is True — user is authenticated
-    return name, username
+    if submitted:
+        username_input = username_input.strip().lower()
+        correct_username = Config.STREAMLIT_USERNAME.strip().lower()
+        correct_password = Config.STREAMLIT_PASSWORD.strip()
+
+        if username_input == correct_username and password_input == correct_password:
+            st.session_state["authenticated"] = True
+            st.session_state["username"] = username_input
+            st.session_state["name"] = username_input
+            st.rerun()
+        else:
+            st.error("Username or password is incorrect. Please try again.")
+
+    st.stop()
