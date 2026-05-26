@@ -24,6 +24,7 @@ import streamlit as st
 from shared.auth import setup_authenticator, require_login, require_permission
 from shared.llm_client import llm
 from shared.utils import load_csv, get_logger
+from shared import user_db
 
 # ---------------------------------------------------------------------------
 # Page configuration — must be the first Streamlit call
@@ -273,7 +274,7 @@ with tab_query:
             """).strip()
 
             with st.spinner("Claude is generating the query…"):
-                generated_code = llm.query(
+                generated_code, tokens = llm.query_with_usage(
                     prompt=prompt,
                     system_message=(
                         "You are a pandas expert. Generate concise, correct pandas code. "
@@ -282,6 +283,8 @@ with tab_query:
                     ),
                     max_tokens=1000,
                 )
+                if tokens > 0:
+                    user_db.record_usage(username, "data_qa", tokens)
 
             result_value, exec_error = execute_pandas_code(generated_code, df)
 
@@ -408,7 +411,7 @@ with tab_chat:
         with st.chat_message("assistant"):
             with st.spinner("Thinking…"):
                 try:
-                    response = llm.query(
+                    response, tokens = llm.query_with_usage(
                         prompt=chat_prompt,
                         system_message=(
                             "You are an expert data analyst. Answer clearly and concisely. "
@@ -416,6 +419,8 @@ with tab_chat:
                         ),
                         max_tokens=1500,
                     )
+                    if tokens > 0:
+                        user_db.record_usage(username, "data_qa", tokens)
                     st.markdown(response)
                     st.session_state.chat_messages.append(
                         {"role": "assistant", "content": response}

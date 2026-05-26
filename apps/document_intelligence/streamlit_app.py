@@ -18,6 +18,7 @@ import streamlit as st
 from shared.auth import setup_authenticator, require_login, require_permission
 from shared.llm_client import llm
 from shared.utils import list_documents, load_document, get_logger
+from shared import user_db
 
 # ---------------------------------------------------------------------------
 # Page configuration — must be the first Streamlit call
@@ -198,12 +199,14 @@ with col_analysis:
                 )
                 with st.spinner("Claude is reading the document…"):
                     try:
-                        answer = llm.query_with_context(
+                        answer, tokens = llm.query_with_context_with_usage(
                             prompt=question.strip(),
                             context=document_text,
                             system_message=SYSTEM_PROMPTS["Q&A"],
                             max_tokens=2000,
                         )
+                        if tokens > 0:
+                            user_db.record_usage(username, "document_intelligence", tokens)
                         st.session_state.last_analysis_key = qa_key
                         st.session_state.last_qa_answer = answer
                     except Exception as exc:  # noqa: BLE001
@@ -226,12 +229,14 @@ with col_analysis:
                 )
                 with st.spinner(f"Running {analysis_type}…"):
                     try:
-                        result = llm.query_with_context(
+                        result, tokens = llm.query_with_context_with_usage(
                             prompt=f"Please perform the following analysis on the document: {analysis_type}",
                             context=document_text,
                             system_message=SYSTEM_PROMPTS[analysis_type],
                             max_tokens=2000,
                         )
+                        if tokens > 0:
+                            user_db.record_usage(username, "document_intelligence", tokens)
                         st.session_state.last_analysis_key = analysis_key
                         st.session_state.last_analysis_result = result
                     except Exception as exc:  # noqa: BLE001

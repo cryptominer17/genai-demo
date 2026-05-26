@@ -24,6 +24,7 @@ import streamlit as st
 from shared.auth import setup_authenticator, require_login, require_permission
 from shared.llm_client import llm
 from shared.utils import load_csv, load_json, get_logger
+from shared import user_db
 
 # ---------------------------------------------------------------------------
 # Page configuration — must be the first Streamlit call
@@ -276,11 +277,13 @@ if generate_button:
 
     with st.spinner(f"Generating {report_type}…"):
         try:
-            report_text = llm.query(
+            report_text, tokens = llm.query_with_usage(
                 prompt=user_prompt,
                 system_message=system_prompt,
                 max_tokens=3000,
             )
+            if tokens > 0:
+                user_db.record_usage(username, "report_generator", tokens)
             st.session_state.report_cache[report_cache_key] = report_text
         except Exception as exc:  # noqa: BLE001
             st.error(f"Error generating report: {exc}")

@@ -27,7 +27,8 @@ class SimpleAuthenticator:
         """
         Verify credentials against user_db and populate session state.
 
-        Sets session keys: authenticated, username, name, role.
+        Sets session keys: authenticated, username, name, role,
+        and must_change_password (when applicable).
         Returns True on success, False on failure.
         """
         user = user_db.get_user_by_username(username.strip().lower())
@@ -45,6 +46,11 @@ class SimpleAuthenticator:
             st.session_state["username"] = user["username"]
             st.session_state["name"] = user["username"]
             st.session_state["role"] = user["role"]
+            # Flag so require_login() can intercept before the app renders.
+            if user.get("must_change_password"):
+                st.session_state["must_change_password"] = True
+            else:
+                st.session_state.pop("must_change_password", None)
             return True
 
         st.session_state["authenticated"] = False
@@ -63,22 +69,65 @@ class SimpleAuthenticator:
             clicked = st.button(button_name, key=_key, type="secondary")
 
         if clicked:
-            for k in ["authenticated", "username", "name", "role"]:
+            for k in ["authenticated", "username", "name", "role", "must_change_password"]:
                 if k in st.session_state:
                     del st.session_state[k]
             st.rerun()
 
     def has_permission(self, app_name: str) -> bool:
-        """Return True if the current user's role can access app_name."""
+        """Return True if the current user's role (and any override) allows access."""
         role = st.session_state.get("role")
+        username = st.session_state.get("username")
         if not role:
             return False
-        return user_db.check_app_permission(role, app_name)
+        return user_db.check_app_permission(role, app_name, username=username)
 
 
 def setup_authenticator() -> SimpleAuthenticator:
     """Create and return a SimpleAuthenticator instance."""
     return SimpleAuthenticator()
+
+
+def _show_force_change_password_form() -> None:
+    """
+    Render a forced password-change form and halt via st.stop().
+
+    Called from require_login() whenever ``must_change_password`` is set in
+    the session.  The user cannot reach any app page until they set a new
+    password, at which point the flag is cleared and the page reruns.
+    """
+    username = st.session_state.get("username", "")
+
+    col1, form_col, col2 = st.columns([1, 2, 1])
+    with form_col:
+        st.warning(
+            "You must set a new password before accessing the platform.",
+            icon="🔒",
+        )
+        st.subheader("Set your password")
+        with st.form("force_pw_change_form"):
+            new_pw = st.text_input("New Password", type="password")
+            confirm_pw = st.text_input("Confirm New Password", type="password")
+            submitted = st.form_submit_button("Set Password", use_container_width=True)
+
+        if submitted:
+            errors = []
+            if len(new_pw) < 8:
+                errors.append("Password must be at least 8 characters.")
+            if new_pw != confirm_pw:
+                errors.append("Passwords do not match.")
+
+            if errors:
+                for e in errors:
+                    st.error(e)
+            else:
+                user_db.update_password(username, new_pw)
+                user_db.set_must_change_password(username, False)
+                st.session_state.pop("must_change_password", None)
+                st.success("Password updated. Loading the platform…")
+                st.rerun()
+
+    st.stop()
 
 
 def require_login(
@@ -88,6 +137,9 @@ def require_login(
     """
     Enforce authentication. Shows a branded login form and halts via st.stop()
     if the user is not logged in.
+
+    If the authenticated user has ``must_change_password`` set, a forced
+    password-change form is shown instead of the requested app.
 
     Parameters
     ----------
@@ -110,6 +162,10 @@ def require_login(
             st.session_state[key] = default
 
     if st.session_state["authenticated"]:
+        # Gate: force the user to set a new password before any app renders.
+        if st.session_state.get("must_change_password"):
+            _show_force_change_password_form()  # never returns; calls st.stop()
+
         if app_name:
             require_permission(app_name)
         return st.session_state["name"], st.session_state["username"]
@@ -190,10 +246,11 @@ def require_login(
 def require_permission(app_name: str) -> None:
     """
     Halt with an access-denied message if the current user lacks permission
-    for *app_name*. Call this immediately after require_login() in each app.
+    for *app_name*. Checks user-level overrides before the role matrix.
     """
     role = st.session_state.get("role")
-    if role and user_db.check_app_permission(role, app_name):
+    username = st.session_state.get("username")
+    if role and user_db.check_app_permission(role, app_name, username=username):
         return
     st.error("You don't have access to this application. Contact your administrator.")
     st.stop()

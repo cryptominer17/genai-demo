@@ -10,6 +10,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import re
+from datetime import date, timedelta
 
 import pandas as pd
 import streamlit as st
@@ -56,13 +57,15 @@ st.divider()
 
 ROLES = ["admin", "analyst", "viewer"]
 APPS = ["document_intelligence", "data_qa", "report_generator", "admin"]
+# Non-admin apps that can have per-user overrides
+USER_APPS = ["document_intelligence", "data_qa", "report_generator"]
 
 # ---------------------------------------------------------------------------
 # Tabs
 # ---------------------------------------------------------------------------
 
-tab_users, tab_add, tab_perms, tab_reset = st.tabs(
-    ["👥 Users", "🔑 Add User", "🔒 App Permissions", "🔄 Reset Password"]
+tab_users, tab_add, tab_perms, tab_reset, tab_usage = st.tabs(
+    ["👥 Users", "🔑 Add User", "🔒 App Permissions", "🔄 Reset Password", "📊 Usage"]
 )
 
 # ===========================================================================
@@ -83,7 +86,10 @@ with tab_users:
     st.subheader("User Directory")
     if users:
         df = pd.DataFrame(users)
-        display_cols = ["username", "email", "role", "is_active", "created_at", "last_login"]
+        display_cols = [
+            "username", "email", "role", "is_active",
+            "must_change_password", "created_at", "last_login",
+        ]
         st.dataframe(df[display_cols], use_container_width=True)
     else:
         st.info("No users found.")
@@ -96,6 +102,8 @@ with tab_users:
         expander_label = f"{status_icon} {uname} ({user['role']})"
         if is_self:
             expander_label += " — you"
+        if user.get("must_change_password"):
+            expander_label += " ⚠️ must change password"
 
         with st.expander(expander_label):
             col_toggle, col_role, col_delete = st.columns([2, 3, 2])
@@ -136,6 +144,50 @@ with tab_users:
                         user_db.delete_user(uname)
                         st.success(f"User '{uname}' deleted.")
                         st.rerun()
+
+            # ---------------------------------------------------------------
+            # App Access Overrides — per-user permissions that override role
+            # ---------------------------------------------------------------
+            st.divider()
+            st.markdown("**App Access Overrides** — override role-based permissions for this user")
+
+            overrides = user_db.get_user_overrides(uname)
+            override_map = {o["app_name"]: bool(o["can_access"]) for o in overrides}
+
+            ov_cols = st.columns(len(USER_APPS))
+            for i, app_n in enumerate(USER_APPS):
+                # Pre-fill: use existing override value; fall back to role permission.
+                if app_n in override_map:
+                    default_val = override_map[app_n]
+                else:
+                    default_val = user_db.check_app_permission(user["role"], app_n)
+
+                ov_cols[i].checkbox(
+                    app_n.replace("_", " ").title(),
+                    value=default_val,
+                    key=f"override_{uname}_{app_n}",
+                    help=(
+                        "Override active" if app_n in override_map
+                        else "Using role default — save to set an explicit override"
+                    ),
+                )
+
+            save_ov_col, info_col = st.columns([1, 3])
+            if save_ov_col.button("Save Overrides", key=f"save_overrides_{uname}"):
+                for app_n in USER_APPS:
+                    can = bool(st.session_state.get(f"override_{uname}_{app_n}", False))
+                    user_db.set_user_override(uname, app_n, can, granted_by=username)
+                st.success(f"Access overrides saved for '{uname}'.")
+                st.rerun()
+
+            if overrides:
+                override_desc = ", ".join(
+                    f"{o['app_name']} ({'✓' if o['can_access'] else '✗'})"
+                    for o in overrides
+                )
+                info_col.caption(f"Active overrides: {override_desc}")
+            else:
+                info_col.caption("No overrides set — all permissions come from role.")
 
 # ===========================================================================
 # TAB 2 — Add User
@@ -178,7 +230,8 @@ with tab_add:
                     f"User created successfully!\n\n"
                     f"**Username:** {created['username']}  \n"
                     f"**Email:** {created['email']}  \n"
-                    f"**Role:** {created['role']}"
+                    f"**Role:** {created['role']}  \n\n"
+                    f"The user will be prompted to set a new password on first login."
                 )
             except ValueError as exc:
                 st.error(str(exc))
@@ -253,6 +306,10 @@ with tab_reset:
         target = st.selectbox("Select User", all_unames)
         reset_pw = st.text_input("New Password", type="password")
         reset_pw_confirm = st.text_input("Confirm New Password", type="password")
+        force_change = st.checkbox(
+            "Require user to change password on next login",
+            value=True,
+        )
         reset_submitted = st.form_submit_button("Reset Password", use_container_width=True)
 
     if reset_submitted:
@@ -267,4 +324,64 @@ with tab_reset:
                 st.error(e)
         else:
             user_db.update_password(target, reset_pw)
-            st.success(f"Password for '{target}' has been reset successfully.")
+            user_db.set_must_change_password(target, force_change)
+            st.success(
+                f"Password for '{target}' has been reset successfully."
+                + (" User will be prompted to change it on next login." if force_change else "")
+            )
+
+# ===========================================================================
+# TAB 5 — Usage
+# ===========================================================================
+
+with tab_usage:
+    st.subheader("Platform Usage")
+
+    # Date-range filter
+    today = date.today()
+    date_range = st.date_input(
+        "Date range",
+        value=(today - timedelta(days=30), today),
+        key="usage_date_range",
+    )
+
+    # Unpack the range — the widget can return a partial tuple while the user
+    # is still clicking, so handle 0, 1, or 2 elements defensively.
+    date_from = date_to = None
+    if isinstance(date_range, (list, tuple)):
+        if len(date_range) >= 1 and date_range[0]:
+            date_from = date_range[0].isoformat()
+        if len(date_range) >= 2 and date_range[1]:
+            date_to = date_range[1].isoformat()
+    elif date_range:
+        date_from = date_range.isoformat()
+
+    summary = user_db.get_usage_summary(date_from=date_from, date_to=date_to)
+
+    if not summary:
+        st.info("No usage data recorded yet for this date range.")
+    else:
+        summary_df = pd.DataFrame(summary)
+
+        # Summary table
+        st.markdown("#### Requests & Tokens by User and App")
+        st.dataframe(summary_df, use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+
+        # Bar chart: total tokens by user
+        st.markdown("#### Total Tokens by User")
+        user_tokens = (
+            summary_df.groupby("username")["total_tokens"]
+            .sum()
+            .reset_index()
+            .set_index("username")
+        )
+        st.bar_chart(user_tokens["total_tokens"])
+
+        # Quick headline metrics
+        st.markdown("---")
+        col_m1, col_m2, col_m3 = st.columns(3)
+        col_m1.metric("Total Requests", int(summary_df["total_requests"].sum()))
+        col_m2.metric("Total Tokens", f"{int(summary_df['total_tokens'].sum()):,}")
+        col_m3.metric("Active Users", summary_df["username"].nunique())

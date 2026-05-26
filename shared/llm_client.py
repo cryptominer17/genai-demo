@@ -114,6 +114,74 @@ class LLMClient:
             max_tokens=max_tokens,
         )
 
+    def query_with_usage(
+        self,
+        prompt: str,
+        system_message: str | None = None,
+        max_tokens: int = 2000,
+    ) -> tuple[str, int]:
+        """
+        Like query(), but also returns the total token count for usage tracking.
+
+        Returns
+        -------
+        tuple[str, int]
+            ``(response_text, total_tokens)``.
+            ``total_tokens`` is 0 when an API error occurs.
+        """
+        kwargs: dict = {
+            "model": self.model,
+            "max_tokens": max_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if system_message:
+            kwargs["system"] = system_message
+
+        try:
+            response = self.client.messages.create(**kwargs)
+            total_tokens = response.usage.input_tokens + response.usage.output_tokens
+            return response.content[0].text, total_tokens
+
+        except anthropic.RateLimitError:
+            return (
+                "Rate limit reached. Please wait a moment and try again. "
+                "If this persists, check your Anthropic plan usage limits.",
+                0,
+            )
+        except anthropic.APIConnectionError:
+            return (
+                "Could not connect to the Anthropic API. "
+                "Check your network connection and try again.",
+                0,
+            )
+        except anthropic.APIError as exc:
+            return f"Anthropic API error ({exc.status_code}): {exc.message}", 0
+        except Exception as exc:  # noqa: BLE001
+            return f"Unexpected error: {str(exc)}", 0
+
+    def query_with_context_with_usage(
+        self,
+        prompt: str,
+        context: str,
+        system_message: str | None = None,
+        max_tokens: int = 2000,
+    ) -> tuple[str, int]:
+        """
+        Like query_with_context(), but also returns the total token count.
+
+        Returns
+        -------
+        tuple[str, int]
+            ``(response_text, total_tokens)``.
+            ``total_tokens`` is 0 when an API error occurs.
+        """
+        grounded_prompt = f"Context:\n{context}\n\nQuestion: {prompt}"
+        return self.query_with_usage(
+            prompt=grounded_prompt,
+            system_message=system_message,
+            max_tokens=max_tokens,
+        )
+
 
 # Module-level singleton — lazy init so import doesn't fail when key is absent
 try:
