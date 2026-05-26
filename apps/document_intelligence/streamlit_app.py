@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../.
 import io
 import streamlit as st
 
-from shared.auth import setup_authenticator, require_login
+from shared.auth import setup_authenticator, require_login, require_permission
 from shared.llm_client import llm
 from shared.utils import list_documents, load_document, get_logger
 
@@ -37,7 +37,8 @@ logger = get_logger("document_intelligence")
 # Authentication
 # ---------------------------------------------------------------------------
 authenticator = setup_authenticator()
-name, username = require_login(authenticator)
+name, username = require_login(authenticator, app_name="document_intelligence")
+require_permission("document_intelligence")
 
 # ---------------------------------------------------------------------------
 # Header row: title + logout button
@@ -83,6 +84,7 @@ with st.sidebar:
         "AI-powered analysis of contracts, policies, financial documents, and more. "
         "Powered by Claude claude-haiku-4-5-20251001."
     )
+    st.caption(f"Logged in as: {username} ({st.session_state.get('role', '')})")
     st.divider()
 
     # --- Document source ---

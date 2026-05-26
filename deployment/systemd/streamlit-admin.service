@@ -1,0 +1,25 @@
+[Unit]
+Description=FI GenAI Admin Panel (Port 8504)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/streamlit run apps/admin/streamlit_app.py \
+  --server.port 8504 \
+  --server.address localhost \
+  --server.baseUrlPath /Admin \
+  --server.headless true \
+  --browser.gatherUsageStats false
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/admin.log
+StandardError=append:/var/log/streamlit/admin-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target

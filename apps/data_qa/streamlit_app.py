@@ -21,7 +21,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from shared.auth import setup_authenticator, require_login
+from shared.auth import setup_authenticator, require_login, require_permission
 from shared.llm_client import llm
 from shared.utils import load_csv, get_logger
 
@@ -43,7 +43,8 @@ logger = get_logger("data_qa")
 # Authentication
 # ---------------------------------------------------------------------------
 authenticator = setup_authenticator()
-name, username = require_login(authenticator)
+name, username = require_login(authenticator, app_name="data_qa")
+require_permission("data_qa")
 
 # ---------------------------------------------------------------------------
 # Header row
@@ -111,6 +112,7 @@ with st.sidebar:
         "Select a dataset and ask a question in plain English. "
         "Claude generates and runs the corresponding pandas query."
     )
+    st.caption(f"Logged in as: {username} ({st.session_state.get('role', '')})")
     st.divider()
 
     # Dataset selector

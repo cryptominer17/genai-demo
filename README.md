@@ -110,6 +110,68 @@ Required secrets for the CI/CD pipeline: [docs/GITHUB_SECRETS_SETUP.md](docs/GIT
 
 ---
 
+## Admin Panel & User Management
+
+### Default Credentials
+
+| Field    | Value                    |
+|----------|--------------------------|
+| Username | `admin`                  |
+| Password | `Admin@123`              |
+| Role     | `admin`                  |
+
+> **Change this password immediately in any production or shared deployment.**
+
+### Accessing the Admin Panel
+
+Navigate to the `/Admin` route on your deployment (e.g. `http://<host>/Admin`).  
+Only users with the `admin` role can reach this panel; all other roles receive an access-denied page.
+
+### Role Permissions
+
+| App                    | admin | analyst | viewer |
+|------------------------|:-----:|:-------:|:------:|
+| document_intelligence  | ✓     | —       | ✓      |
+| data_qa                | ✓     | ✓       | —      |
+| report_generator       | ✓     | ✓       | —      |
+| admin                  | ✓     | —       | —      |
+
+### Fresh-Install Setup
+
+Run the setup script once after cloning to initialise the SQLite database and create the default admin:
+
+```bash
+# From the project root
+python scripts/setup_admin.py
+```
+
+To create a custom first admin instead of the default:
+
+```bash
+python scripts/setup_admin.py --username alice --email alice@example.com --password MyPass@1
+```
+
+The script prints a user table and the full access matrix on exit.
+
+### Adding the Admin App to systemd
+
+A service file is included at `deployment/systemd/streamlit-admin.service` (port 8504, base path `/Admin`).
+
+```bash
+sudo cp deployment/systemd/streamlit-admin.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now streamlit-admin
+sudo systemctl status streamlit-admin
+```
+
+Then add the proxy rule to `deployment/nginx.conf` (already present) and reload Nginx:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+---
+
 ## Troubleshooting
 
 Common issues and fixes: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)

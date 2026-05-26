@@ -21,7 +21,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
-from shared.auth import setup_authenticator, require_login
+from shared.auth import setup_authenticator, require_login, require_permission
 from shared.llm_client import llm
 from shared.utils import load_csv, load_json, get_logger
 
@@ -43,7 +43,8 @@ logger = get_logger("report_generator")
 # Authentication
 # ---------------------------------------------------------------------------
 authenticator = setup_authenticator()
-name, username = require_login(authenticator)
+name, username = require_login(authenticator, app_name="report_generator")
+require_permission("report_generator")
 
 # ---------------------------------------------------------------------------
 # Header row
@@ -209,6 +210,7 @@ DEPTH_INSTRUCTIONS = {
 # ---------------------------------------------------------------------------
 with st.sidebar:
     st.header("Report Configuration")
+    st.caption(f"Logged in as: {username} ({st.session_state.get('role', '')})")
     st.divider()
 
     report_type = st.selectbox("Report type", REPORT_TYPES)
