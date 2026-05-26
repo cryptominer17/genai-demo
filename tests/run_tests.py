@@ -79,6 +79,9 @@ def run_pytest() -> dict:
     """
     json_path = JSON_REPORT_FILE
 
+    # Ensure DROPLET_IP is visible to tests via os.environ (no pytest-env plugin needed)
+    os.environ.setdefault("DROPLET_IP", DROPLET_IP)
+
     cmd = [
         sys.executable, "-m", "pytest",
         TEST_MODULE,
@@ -87,8 +90,6 @@ def run_pytest() -> dict:
         "--json-report",
         f"--json-report-file={json_path}",
         "--json-report-indent=2",
-        # Inject DROPLET_IP so HTTP tests can pick it up
-        f"--env=DROPLET_IP={DROPLET_IP}",
     ]
 
     print(f"\n{'='*60}")
