@@ -1,0 +1,145 @@
+name: Platform Test Suite
+
+# ---------------------------------------------------------------------------
+# Triggers
+#   1. Automatically after a successful deploy (workflow_run)
+#   2. Manually via GitHub UI / API (workflow_dispatch)
+# ---------------------------------------------------------------------------
+on:
+  workflow_run:
+    workflows:
+      - "Deploy to Digital Ocean Droplet"
+    types:
+      - completed
+
+  workflow_dispatch:
+    inputs:
+      notify_on_pass:
+        description: "Send email even when all tests pass"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+# ---------------------------------------------------------------------------
+# Guard: only run tests when the deploy that triggered this actually succeeded.
+# For manual dispatch there is no workflow_run event, so the condition is true.
+# ---------------------------------------------------------------------------
+jobs:
+  test:
+    name: Run test suite on droplet
+    runs-on: ubuntu-latest
+
+    # Skip if triggered by a failed deploy
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Checkout repo (needed to read scripts / reference paths)
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+      # -----------------------------------------------------------------------
+      # 2. Configure SSH access to the droplet
+      # -----------------------------------------------------------------------
+      - name: Configure SSH
+        env:
+          DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DROPLET_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DROPLET_IP" >> ~/.ssh/known_hosts 2>/dev/null
+
+      # -----------------------------------------------------------------------
+      # 3. Wait for services to be fully up (only relevant after a fresh deploy)
+      # -----------------------------------------------------------------------
+      - name: Wait for platform to stabilise
+        if: github.event_name == 'workflow_run'
+        run: |
+          echo "Pausing 15s to let Streamlit services finish starting..."
+          sleep 15
+
+      # -----------------------------------------------------------------------
+      # 4. Install pytest-json-report on the droplet (idempotent)
+      # -----------------------------------------------------------------------
+      - name: Install test dependencies on droplet
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              "$DROPLET_USER@$DROPLET_IP" \
+              'cd /opt/fi-genai-poc-platform && source venv/bin/activate && \
+               pip install --quiet pytest pytest-json-report requests bcrypt'
+
+      # -----------------------------------------------------------------------
+      # 5. Run the test suite on the droplet
+      #    - SMTP_PASSWORD and ANTHROPIC_API_KEY are injected at runtime
+      #    - DROPLET_IP is passed so HTTP endpoint tests know where to connect
+      #    - run_tests.py handles pytest invocation + email report
+      # -----------------------------------------------------------------------
+      - name: Run test suite
+        id: run_tests
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              "$DROPLET_USER@$DROPLET_IP" \
+              "cd /opt/fi-genai-poc-platform && \
+               source venv/bin/activate && \
+               DROPLET_IP='${{ secrets.DROPLET_IP }}' \
+               SMTP_PASSWORD='$SMTP_PASSWORD' \
+               ANTHROPIC_API_KEY='$ANTHROPIC_API_KEY' \
+               python3 tests/run_tests.py"
+          echo "test_exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 6. If the test runner itself failed (e.g. SSH error), send a plain
+      #    failure notification using the existing notify.py script.
+      # -----------------------------------------------------------------------
+      - name: Notify on runner failure
+        if: failure()
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o StrictHostKeyChecking=accept-new \
+              "$DROPLET_USER@$DROPLET_IP" \
+              "cd /opt/fi-genai-poc-platform && \
+               source venv/bin/activate && \
+               SMTP_PASSWORD='$SMTP_PASSWORD' \
+               python3 deployment/email/notify.py \
+               'FAILURE' \
+               'Test suite runner encountered an infrastructure error. Check GitHub Actions logs.'" \
+          || true
+
+      # -----------------------------------------------------------------------
+      # 7. Surface test exit code back to GitHub Actions
+      #    (run_tests.py already sent the detailed HTML report via email;
+      #    this step just makes the workflow go red/green appropriately)
+      # -----------------------------------------------------------------------
+      - name: Propagate test exit code
+        if: always()
+        run: |
+          EXIT="${{ steps.run_tests.outputs.test_exit_code }}"
+          if [ "$EXIT" != "0" ] && [ -n "$EXIT" ]; then
+            echo "::error::Test suite reported failures. See the emailed HTML report for details."
+            exit 1
+          fi
+          echo "All tests passed."
