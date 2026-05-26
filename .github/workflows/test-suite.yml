@@ -98,6 +98,8 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key \
               -o StrictHostKeyChecking=accept-new \
+              -o ServerAliveInterval=30 \
+              -o ServerAliveCountMax=10 \
               "$DROPLET_USER@$DROPLET_IP" \
               "cd /opt/fi-genai-poc-platform && \
                source venv/bin/activate && \

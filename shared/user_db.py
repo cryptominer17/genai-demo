@@ -179,7 +179,9 @@ def create_user(username: str, email: str, password: str, role: str = "viewer") 
     except sqlite3.IntegrityError as exc:
         raise ValueError(f"Duplicate username or email: {exc}") from exc
 
-    return get_user_by_username(username)
+    user = get_user_by_username(username)
+    user.pop("password_hash", None)  # never expose the hash to callers
+    return user
 
 
 def get_user_by_username(username: str) -> dict | None:
