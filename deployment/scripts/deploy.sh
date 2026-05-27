@@ -58,7 +58,13 @@ if [ ! -f "$REPO_DIR/.env" ]; then
 fi
 log ".env file found."
 
-# ── Step 6: Install / refresh systemd service files ──────────────────────────
+# ── Step 6a: Apply sysctl tuning (inotify watches for Streamlit/watchdog) ────
+log "Applying sysctl tuning..."
+sudo cp "$REPO_DIR/deployment/sysctl/99-fi-genai.conf" /etc/sysctl.d/99-fi-genai.conf
+sudo sysctl --system --quiet 2>/dev/null || sudo sysctl -p /etc/sysctl.d/99-fi-genai.conf
+log "sysctl tuning applied (fs.inotify.max_user_watches=524288)."
+
+# ── Step 6b: Install / refresh systemd service files ─────────────────────────
 log "Installing systemd service files from repo..."
 sudo cp "$REPO_DIR/deployment/systemd/"*.service /etc/systemd/system/
 sudo systemctl daemon-reload
