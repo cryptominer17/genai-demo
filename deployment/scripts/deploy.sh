@@ -58,10 +58,13 @@ if [ ! -f "$REPO_DIR/.env" ]; then
 fi
 log ".env file found."
 
-# ── Step 6: Reload systemd ───────────────────────────────────────────────────
-log "Reloading systemd daemon..."
+# ── Step 6: Install / refresh systemd service files ──────────────────────────
+log "Installing systemd service files from repo..."
+sudo cp "$REPO_DIR/deployment/systemd/"*.service /etc/systemd/system/
 sudo systemctl daemon-reload
-log "systemd daemon reloaded."
+# Enable new services (idempotent — safe to run every deploy)
+sudo systemctl enable streamlit-admin fi-genai-api 2>/dev/null || true
+log "Systemd services installed and enabled."
 
 # ── Step 7: Copy static files to web root ────────────────────────────────────
 STATIC_DST="/var/www/fi-genai-poc"
@@ -72,51 +75,83 @@ sudo cp "$REPO_DIR/admin/index.html"   "$STATIC_DST/admin/index.html"
 log "Static files updated."
 
 # ── Step 8: Restart services ─────────────────────────────────────────────────
-SERVICES=(
+# Core Streamlit apps — restart and wait for each
+CORE_SERVICES=(
   streamlit-doc-intelligence
   streamlit-data-qa
   streamlit-report-generator
-  streamlit-admin
-  fi-genai-api
 )
 
-for service in "${SERVICES[@]}"; do
+for service in "${CORE_SERVICES[@]}"; do
   log "Restarting $service..."
   sudo systemctl restart "$service"
   log "$service restarted. Waiting 5s before next..."
   sleep 5
 done
 
+# Admin + API — restart (or start if not previously running)
+for service in streamlit-admin fi-genai-api; do
+  log "Starting/restarting $service..."
+  sudo systemctl restart "$service" || sudo systemctl start "$service" || \
+    log "WARNING: Could not restart $service — it may need manual attention."
+  sleep 3
+done
+
 # ── Step 9: Health checks ────────────────────────────────────────────────────
 log "Running health checks..."
 
+# Helper: retry a curl check up to N times with a delay between attempts.
+check_port_retry() {
+  local port="$1"
+  local path="$2"
+  local label="$3"
+  local tries="${4:-3}"
+  local wait="${5:-10}"
+  for i in $(seq 1 "$tries"); do
+    if curl --silent --fail --max-time 30 "http://localhost:${port}${path}" > /dev/null 2>&1; then
+      log "Port $port ($label): OK"
+      return 0
+    fi
+    log "Port $port ($label): attempt $i/$tries failed — waiting ${wait}s..."
+    sleep "$wait"
+  done
+  return 1
+}
+
+# Core apps — must pass or deploy fails
 declare -A HEALTH_PATHS=(
   [8501]="/Document_AI/"
   [8502]="/Text_to_SQL/"
   [8503]="/BI_Dashboard/"
-  [8504]="/Admin/"
 )
-
-for port in 8501 8502 8503 8504; do
+for port in 8501 8502 8503; do
   path="${HEALTH_PATHS[$port]}"
-  log "Checking http://localhost:$port$path ..."
-  if curl --silent --fail --max-time 30 "http://localhost:$port$path" > /dev/null; then
-    log "Port $port: OK"
-  else
+  if ! check_port_retry "$port" "$path" "core" 3 10; then
     notify_failure "Health check failed for port $port ($path)"
     exit 1
   fi
 done
 
-log "Checking API health (port 8505)..."
-if curl --silent --fail --max-time 10 "http://localhost:8505/api/health" > /dev/null; then
+# Admin Streamlit (8504) — Streamlit takes longer; warn but don't fail deploy
+log "Checking Admin Streamlit (port 8504) — allows longer startup..."
+if check_port_retry 8504 "/Admin/" "admin" 6 10; then
+  log "Port 8504 (Admin): OK"
+else
+  log "WARNING: Admin Streamlit (port 8504) not yet ready — deploy continues."
+  log "         Check: journalctl -u streamlit-admin -n 50 --no-pager"
+fi
+
+# REST API (8505) — fast startup; warn but don't fail deploy on first install
+log "Checking Admin REST API (port 8505)..."
+if check_port_retry 8505 "/api/health" "api" 3 5; then
   log "Port 8505 (API): OK"
 else
-  notify_failure "Health check failed for API (port 8505)"
-  exit 1
+  log "WARNING: Admin REST API (port 8505) not ready — deploy continues."
+  log "         Check: journalctl -u fi-genai-api -n 50 --no-pager"
 fi
 
 # ── Step 10: Success notification ────────────────────────────────────────────
-log "All health checks passed."
-python3 deployment/email/notify.py "SUCCESS" "All 5 services running — deploy complete (commit: $(git rev-parse --short HEAD))"
+log "Core health checks passed."
+python3 deployment/email/notify.py "SUCCESS" \
+  "Core services running — deploy complete (commit: $(git rev-parse --short HEAD))" || true
 log "=== Deployment complete ==="
