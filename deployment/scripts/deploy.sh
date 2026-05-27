@@ -63,11 +63,21 @@ log "Reloading systemd daemon..."
 sudo systemctl daemon-reload
 log "systemd daemon reloaded."
 
-# ── Step 7: Restart services ─────────────────────────────────────────────────
+# ── Step 7: Copy static files to web root ────────────────────────────────────
+STATIC_DST="/var/www/fi-genai-poc"
+log "Copying static HTML files to $STATIC_DST..."
+sudo mkdir -p "$STATIC_DST/landing" "$STATIC_DST/admin"
+sudo cp "$REPO_DIR/landing/index.html" "$STATIC_DST/landing/index.html"
+sudo cp "$REPO_DIR/admin/index.html"   "$STATIC_DST/admin/index.html"
+log "Static files updated."
+
+# ── Step 8: Restart services ─────────────────────────────────────────────────
 SERVICES=(
   streamlit-doc-intelligence
   streamlit-data-qa
   streamlit-report-generator
+  streamlit-admin
+  fi-genai-api
 )
 
 for service in "${SERVICES[@]}"; do
@@ -77,16 +87,17 @@ for service in "${SERVICES[@]}"; do
   sleep 5
 done
 
-# ── Step 8: Health checks ────────────────────────────────────────────────────
+# ── Step 9: Health checks ────────────────────────────────────────────────────
 log "Running health checks..."
 
 declare -A HEALTH_PATHS=(
   [8501]="/Document_AI/"
   [8502]="/Text_to_SQL/"
   [8503]="/BI_Dashboard/"
+  [8504]="/Admin/"
 )
 
-for port in 8501 8502 8503; do
+for port in 8501 8502 8503 8504; do
   path="${HEALTH_PATHS[$port]}"
   log "Checking http://localhost:$port$path ..."
   if curl --silent --fail --max-time 30 "http://localhost:$port$path" > /dev/null; then
@@ -97,7 +108,15 @@ for port in 8501 8502 8503; do
   fi
 done
 
-# ── Step 9: Success notification ─────────────────────────────────────────────
+log "Checking API health (port 8505)..."
+if curl --silent --fail --max-time 10 "http://localhost:8505/api/health" > /dev/null; then
+  log "Port 8505 (API): OK"
+else
+  notify_failure "Health check failed for API (port 8505)"
+  exit 1
+fi
+
+# ── Step 10: Success notification ────────────────────────────────────────────
 log "All health checks passed."
-python3 deployment/email/notify.py "SUCCESS" "All 3 services running — deploy complete (commit: $(git rev-parse --short HEAD))"
+python3 deployment/email/notify.py "SUCCESS" "All 5 services running — deploy complete (commit: $(git rev-parse --short HEAD))"
 log "=== Deployment complete ==="

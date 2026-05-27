@@ -513,7 +513,7 @@ body {
     <nav class="sidebar-nav">
       <span class="nav-label">Applications</span>
 
-      <a href="http://157.230.82.180/Document_AI/" class="nav-link active" target="_blank" title="Document AI">
+      <a href="/Document_AI/" class="nav-link active" target="_blank" title="Document AI">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
@@ -523,7 +523,7 @@ body {
         Document AI
       </a>
 
-      <a href="http://157.230.82.180/Text_to_SQL/" class="nav-link" target="_blank" title="Data Q&amp;A">
+      <a href="/Text_to_SQL/" class="nav-link" target="_blank" title="Data Q&amp;A">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <ellipse cx="12" cy="5" rx="9" ry="3"/>
           <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
@@ -532,7 +532,7 @@ body {
         Data Q&amp;A
       </a>
 
-      <a href="http://157.230.82.180/BI_Dashboard/" class="nav-link" target="_blank" title="Report Generator">
+      <a href="/BI_Dashboard/" class="nav-link" target="_blank" title="Report Generator">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="20" x2="18" y2="10"/>
           <line x1="12" y1="20" x2="12" y2="4"/>
@@ -586,14 +586,14 @@ body {
         </div>
       </div>
 
-      <button class="logout-btn">
+      <a href="/Admin/" class="logout-btn" style="text-decoration:none;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
           <polyline points="16 17 21 12 16 7"/>
           <line x1="21" y1="12" x2="9" y2="12"/>
         </svg>
-        Logout
-      </button>
+        Sign Out
+      </a>
     </div>
   </aside>
 
@@ -619,34 +619,20 @@ body {
         </svg>
         <h1 class="page-title">FI GenAI PoC Platform</h1>
       </div>
-      <p class="header-sub">Welcome back, <strong>Platform Admin</strong>. Select a feature below or from the sidebar to launch an app.</p>
-
-      <!-- Password Change Alert -->
-      <div class="pw-banner">
-        <svg class="pw-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-        <div class="pw-text">
-          <div class="pw-title">Password Change Required</div>
-          <div class="pw-desc">You must update your default password before using the platform — required for account security.</div>
-        </div>
-        <a href="/admin/" class="pw-cta">Change Password &rarr;</a>
-      </div>
+      <p class="header-sub">Select a feature below or from the sidebar to launch an app.</p>
     </div>
 
     <!-- Feature Cards -->
     <div>
       <div class="section-hd">
         <span class="section-title">Available Features</span>
-        <span class="section-meta">3 active &nbsp;&middot;&nbsp; 1 coming soon</span>
+        <span class="section-meta">3 active</span>
       </div>
 
       <div class="features-grid">
 
         <!-- Document AI -->
-        <a href="http://157.230.82.180/Document_AI/" class="feature-card" target="_blank">
+        <a href="/Document_AI/" class="feature-card" target="_blank">
           <div class="card-icon-wrap">
             <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -667,7 +653,7 @@ body {
         </a>
 
         <!-- Data Q&A -->
-        <a href="http://157.230.82.180/Text_to_SQL/" class="feature-card" target="_blank">
+        <a href="/Text_to_SQL/" class="feature-card" target="_blank">
           <div class="card-icon-wrap">
             <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <ellipse cx="12" cy="5" rx="9" ry="3"/>
@@ -687,7 +673,7 @@ body {
         </a>
 
         <!-- Report Generator -->
-        <a href="http://157.230.82.180/BI_Dashboard/" class="feature-card" target="_blank">
+        <a href="/BI_Dashboard/" class="feature-card" target="_blank">
           <div class="card-icon-wrap">
             <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="20" x2="18" y2="10"/>
@@ -707,27 +693,6 @@ body {
           </span>
         </a>
 
-        <!-- Coming Soon — full-width teaser -->
-        <div class="coming-card">
-          <div class="coming-icon-wrap">
-            <svg class="coming-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </div>
-          <div class="coming-text">
-            <div class="coming-title">More Apps &mdash; Coming Soon</div>
-            <p class="coming-desc">Additional AI-powered tools are in active development. Check back for upcoming releases from the AI Platform team.</p>
-          </div>
-          <span class="card-badge badge-soon" style="flex-shrink:0;align-self:center;margin-bottom:0;">Coming Soon</span>
-          <button class="notify-btn">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-            Notify Me
-          </button>
-        </div>
 
       </div>
     </div>

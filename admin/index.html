@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FI GenAI PoC Platform — Admin</title>
+<title>FI GenAI Platform — Admin</title>
 <style>
 /* ── Reset & Base ── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,6 +30,79 @@ body {
   --border:       #dde5dd;
   --border-light: #eef2ee;
 }
+
+/* ── Login Overlay ── */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: #f4f6f4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.login-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+  border: 1px solid var(--border-light);
+}
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.login-brand-text { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.login-brand-sub  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.login-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.login-input {
+  width: 100%;
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13.5px;
+  color: var(--text);
+  background: #fff;
+  margin-bottom: 14px;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+.login-input:focus { outline: none; border-color: var(--green-border); box-shadow: 0 0 0 3px rgba(0,102,51,0.08); }
+.login-error {
+  display: none;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.login-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.login-btn:hover { background: var(--green-dark); }
+.login-btn:disabled { opacity: 0.6; cursor: default; }
 
 /* ── Layout ── */
 .layout { display: flex; min-height: 100vh; }
@@ -430,6 +503,7 @@ tbody tr:hover { background: var(--green-tint); }
 .chip-data { background: #fef3c7; color: #92400e; }
 .chip-rpt  { background: #ede9fe; color: #5b21b6; }
 .chip-all  { background: var(--green-light); color: var(--green); }
+.chip-none { background: #f3f4f6; color: #6b7280; }
 
 /* Status pill */
 .status-pill {
@@ -452,7 +526,7 @@ tbody tr:hover { background: var(--green-tint); }
 .status-inactive::before { background: #ef4444; }
 
 /* Action buttons */
-.action-group { display: flex; gap: 6px; align-items: center; }
+.action-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .act-btn {
   padding: 5px 11px;
   border-radius: 5px;
@@ -463,15 +537,19 @@ tbody tr:hover { background: var(--green-tint); }
   transition: background 0.13s, border-color 0.13s;
   white-space: nowrap;
 }
-.act-edit  { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
+.act-edit    { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
 .act-edit:hover  { background: #c6ddd0; border-color: #9abfaa; }
-.act-revoke { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
-.act-revoke:hover { background: #fecaca; border-color: #f87171; }
-.act-reset { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.act-revoke  { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+.act-revoke:hover  { background: #fecaca; border-color: #f87171; }
+.act-activate { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+.act-activate:hover { background: #a7f3d0; }
+.act-reset   { background: #fef3c7; color: #92400e; border-color: #fde68a; }
 .act-reset:hover { background: #fde68a; border-color: #fbbf24; }
+.act-delete  { background: #fff; color: #b91c1c; border-color: #fca5a5; }
+.act-delete:hover { background: #fee2e2; }
 
 /* ══════════════════════════════
-   TOGGLE UI (Access Grants)
+   TOGGLE UI (Access Control)
 ══════════════════════════════ */
 .access-grid {
   display: flex;
@@ -507,8 +585,6 @@ tbody tr:hover { background: var(--green-tint); }
 .toggle-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .toggle-label-sm { font-size: 11px; color: var(--text-muted); }
 
-/* Toggle switch */
-.toggle-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .toggle {
   position: relative;
   display: inline-block;
@@ -539,7 +615,6 @@ tbody tr:hover { background: var(--green-tint); }
 }
 .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
 .toggle-state { font-size: 10px; font-weight: 600; color: var(--text-muted); }
-.toggle input:checked ~ .toggle-state { color: var(--green); }
 
 /* ══════════════════════════════
    USAGE ANALYTICS
@@ -628,39 +703,11 @@ tbody tr:hover { background: var(--green-tint); }
   box-shadow: 0 0 0 3px rgba(0,102,51,0.08);
 }
 
-/* App toggles in modal */
-.app-toggles {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  background: var(--green-tint);
-  border-radius: 8px;
-  border: 1px solid var(--green-border);
-}
-.app-toggle-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.app-toggle-info { display: flex; align-items: center; gap: 8px; }
-.app-toggle-icon {
-  width: 28px; height: 28px;
-  border-radius: 6px;
-  background: var(--green-light);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.app-toggle-icon svg { width: 13px; height: 13px; color: var(--green); }
-.app-toggle-name { font-size: 13px; font-weight: 600; color: var(--text); }
-.app-toggle-desc { font-size: 11px; color: var(--text-muted); }
-
 .modal-actions {
   display: flex;
   gap: 10px;
   margin-top: 28px;
+  flex-wrap: wrap;
 }
 .modal-btn {
   flex: 1;
@@ -671,11 +718,14 @@ tbody tr:hover { background: var(--green-tint); }
   cursor: pointer;
   border: none;
   transition: background 0.13s;
+  min-width: 100px;
 }
-.modal-btn-primary { background: var(--green); color: #fff; }
+.modal-btn-primary   { background: var(--green); color: #fff; }
 .modal-btn-primary:hover { background: var(--green-dark); }
 .modal-btn-secondary { background: var(--border-light); color: var(--text-mid); }
 .modal-btn-secondary:hover { background: var(--border); }
+.modal-btn-danger    { background: #fee2e2; color: #b91c1c; }
+.modal-btn-danger:hover { background: #fecaca; }
 
 /* ══════════════════════════════
    TOAST NOTIFICATIONS
@@ -718,6 +768,8 @@ tbody tr:hover { background: var(--green-tint); }
   padding: 2px;
   flex-shrink: 0;
   color: inherit;
+  font-size: 16px;
+  line-height: 1;
 }
 .toast-dismiss:hover { opacity: 1; }
 
@@ -733,9 +785,7 @@ tbody tr:hover { background: var(--green-tint); }
 /* ── Responsive ── */
 @media (max-width: 1100px) {
   .summary-strip { grid-template-columns: repeat(2, 1fr); }
-  .access-row, .access-header-grid {
-    grid-template-columns: 160px 1fr 1fr 1fr 100px;
-  }
+  .access-row, .access-header-grid { grid-template-columns: 160px 1fr 1fr 1fr 100px; }
 }
 @media (max-width: 820px) {
   .layout { flex-direction: column; }
@@ -743,24 +793,50 @@ tbody tr:hover { background: var(--green-tint); }
   .main { padding: 20px; gap: 18px; }
   .summary-strip { grid-template-columns: repeat(2, 1fr); }
   .page-header { flex-direction: column; align-items: flex-start; }
-  .access-row, .access-header-grid {
-    grid-template-columns: 1fr;
-  }
+  .access-row, .access-header-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<!-- Toast container -->
+<!-- ══ LOGIN OVERLAY ══ -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-box">
+    <div class="login-brand">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+        <rect width="40" height="40" rx="9" fill="#006633"/>
+        <rect x="11" y="12" width="10" height="2.5" rx="1.25" fill="#fff"/>
+        <rect x="11" y="18.75" width="7" height="2.5" rx="1.25" fill="#fff"/>
+        <rect x="11" y="25.5" width="10" height="2.5" rx="1.25" fill="#fff"/>
+        <rect x="24" y="12" width="2.5" height="16" rx="1.25" fill="#fff"/>
+      </svg>
+      <div>
+        <div class="login-brand-text">FI GenAI Admin</div>
+        <div class="login-brand-sub">Sign in to manage the platform</div>
+      </div>
+    </div>
+    <form onsubmit="doLogin(event)">
+      <label class="login-label" for="loginUser">Username</label>
+      <input class="login-input" id="loginUser" type="text" autocomplete="username" placeholder="admin" required>
+      <label class="login-label" for="loginPass">Password</label>
+      <input class="login-input" id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      <div id="loginError" class="login-error"></div>
+      <button id="loginBtn" class="login-btn" type="submit">Sign In</button>
+    </form>
+  </div>
+</div>
+
+<!-- ══ TOAST CONTAINER ══ -->
 <div id="toast-container"></div>
 
-<div class="layout">
+<!-- ══ DASHBOARD (hidden until login) ══ -->
+<div id="dashboardLayout" class="layout" style="display:none">
 
   <!-- ══ SIDEBAR ══ -->
   <aside class="sidebar">
 
     <div class="sidebar-brand">
-      <svg class="brand-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg class="brand-mark" viewBox="0 0 36 36" fill="none">
         <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.18)"/>
         <rect x="10" y="11" width="9" height="2.5" rx="1.25" fill="#fff"/>
         <rect x="10" y="16.75" width="6" height="2.5" rx="1.25" fill="#fff"/>
@@ -776,7 +852,7 @@ tbody tr:hover { background: var(--green-tint); }
     <nav class="sidebar-nav">
       <span class="nav-label">Applications</span>
 
-      <a href="http://157.230.82.180/Document_AI/" class="nav-link" target="_blank">
+      <a href="/Document_AI/" class="nav-link" target="_blank">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
@@ -786,7 +862,7 @@ tbody tr:hover { background: var(--green-tint); }
         Document AI
       </a>
 
-      <a href="http://157.230.82.180/Text_to_SQL/" class="nav-link" target="_blank">
+      <a href="/Text_to_SQL/" class="nav-link" target="_blank">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <ellipse cx="12" cy="5" rx="9" ry="3"/>
           <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
@@ -795,7 +871,7 @@ tbody tr:hover { background: var(--green-tint); }
         Data Q&amp;A
       </a>
 
-      <a href="http://157.230.82.180/BI_Dashboard/" class="nav-link" target="_blank">
+      <a href="/BI_Dashboard/" class="nav-link" target="_blank">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="20" x2="18" y2="10"/>
           <line x1="12" y1="20" x2="12" y2="4"/>
@@ -844,11 +920,10 @@ tbody tr:hover { background: var(--green-tint); }
       </a>
     </nav>
 
-    <!-- Session Activity -->
     <div class="sidebar-footer">
       <div class="session-header">
-        <span class="session-title">Session Activity</span>
-        <button class="refresh-btn" title="Refresh" onclick="refreshUsage(this)">
+        <span class="session-title" id="sidebarUserLabel">Signed in</span>
+        <button class="refresh-btn" title="Refresh stats" onclick="refreshStats(this)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"/>
             <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
@@ -859,20 +934,20 @@ tbody tr:hover { background: var(--green-tint); }
       <div class="usage-metric">
         <div class="usage-top">
           <span class="usage-lbl">Active Users</span>
-          <span class="usage-val">4 / 5</span>
+          <span class="usage-val" id="sidebarActiveUsers">—</span>
         </div>
-        <div class="usage-track"><div class="usage-fill" style="width:80%"></div></div>
+        <div class="usage-track"><div class="usage-fill" id="sidebarActiveUsersBar" style="width:0%"></div></div>
       </div>
 
       <div class="usage-metric">
         <div class="usage-top">
-          <span class="usage-lbl">Today's Requests</span>
-          <span class="usage-val">47 / 100</span>
+          <span class="usage-lbl">Requests Today</span>
+          <span class="usage-val" id="sidebarRequestsToday">—</span>
         </div>
-        <div class="usage-track"><div class="usage-fill" style="width:47%"></div></div>
+        <div class="usage-track"><div class="usage-fill" id="sidebarRequestsBar" style="width:0%"></div></div>
       </div>
 
-      <button class="logout-btn">
+      <button class="logout-btn" onclick="doLogout()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
           <polyline points="16 17 21 12 16 7"/>
@@ -889,7 +964,7 @@ tbody tr:hover { background: var(--green-tint); }
     <!-- Page Header -->
     <div class="page-header">
       <div class="header-left">
-        <svg class="header-logo" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="header-logo" viewBox="0 0 40 40" fill="none">
           <rect width="40" height="40" rx="9" fill="#006633"/>
           <rect x="11" y="12" width="10" height="2.5" rx="1.25" fill="#fff"/>
           <rect x="11" y="18.75" width="7" height="2.5" rx="1.25" fill="#fff"/>
@@ -898,10 +973,10 @@ tbody tr:hover { background: var(--green-tint); }
         </svg>
         <div>
           <div class="page-title">Admin Dashboard</div>
-          <div class="header-sub">Manage users, access grants, and platform usage &mdash; FI GenAI PoC</div>
+          <div class="header-sub" id="headerSub">Manage users, access grants, and platform usage</div>
         </div>
       </div>
-      <button class="add-user-btn" onclick="openModal()">
+      <button class="add-user-btn" onclick="openAddUserModal()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
@@ -921,7 +996,7 @@ tbody tr:hover { background: var(--green-tint); }
           </svg>
         </div>
         <div>
-          <div class="summary-val">5</div>
+          <div class="summary-val" id="statTotalUsers">—</div>
           <div class="summary-lbl">Total Users</div>
         </div>
       </div>
@@ -929,13 +1004,13 @@ tbody tr:hover { background: var(--green-tint); }
       <div class="summary-card">
         <div class="summary-icon-wrap">
           <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
           </svg>
         </div>
         <div>
-          <div class="summary-val">4</div>
-          <div class="summary-lbl">Active Sessions</div>
+          <div class="summary-val" id="statActiveUsers">—</div>
+          <div class="summary-lbl">Active Users</div>
         </div>
       </div>
 
@@ -946,7 +1021,7 @@ tbody tr:hover { background: var(--green-tint); }
           </svg>
         </div>
         <div>
-          <div class="summary-val">47</div>
+          <div class="summary-val" id="statRequestsToday">—</div>
           <div class="summary-lbl">Requests Today</div>
         </div>
       </div>
@@ -960,7 +1035,7 @@ tbody tr:hover { background: var(--green-tint); }
           </svg>
         </div>
         <div>
-          <div class="summary-val">38.2k</div>
+          <div class="summary-val" id="statTokensToday">—</div>
           <div class="summary-lbl">Tokens Today</div>
         </div>
       </div>
@@ -970,7 +1045,7 @@ tbody tr:hover { background: var(--green-tint); }
     <div id="section-users" class="section-card">
       <div class="section-card-header">
         <div class="section-card-title">User Management</div>
-        <span class="section-card-meta">5 users &nbsp;&middot;&nbsp; 4 active</span>
+        <span class="section-card-meta" id="userMeta">Loading…</span>
       </div>
 
       <div class="table-toolbar">
@@ -978,7 +1053,7 @@ tbody tr:hover { background: var(--green-tint); }
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <input class="search-input" type="text" id="userSearch" placeholder="Search users..." oninput="filterUsers()">
+          <input class="search-input" type="text" id="userSearch" placeholder="Search users…" oninput="filterUsers()">
         </div>
         <select class="filter-select" id="statusFilter" onchange="filterUsers()">
           <option value="">All Status</option>
@@ -997,102 +1072,16 @@ tbody tr:hover { background: var(--green-tint); }
         <table id="usersTable">
           <thead>
             <tr>
-              <th onclick="sortTable(0)">Username <i class="sort-icon">↕</i></th>
+              <th onclick="sortTable(0)">User / Role <i class="sort-icon">↕</i></th>
               <th onclick="sortTable(1)">Email <i class="sort-icon">↕</i></th>
               <th onclick="sortTable(2)">Last Login <i class="sort-icon">↕</i></th>
-              <th>Apps Granted</th>
+              <th>App Access</th>
               <th onclick="sortTable(4)">Status <i class="sort-icon">↕</i></th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="usersBody">
-            <tr data-status="active" data-apps="Document AI,Data Q&amp;A,Report Generator">
-              <td class="user-name">Platform Admin</td>
-              <td class="user-email">admin@fidelity.com</td>
-              <td>Today, 09:12</td>
-              <td><div class="app-chips"><span class="app-chip chip-all">All Apps</span></div></td>
-              <td><span class="status-pill status-active">Active</span></td>
-              <td>
-                <div class="action-group">
-                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
-                </div>
-              </td>
-            </tr>
-            <tr data-status="active" data-apps="Document AI,Data Q&amp;A">
-              <td class="user-name">John Smith</td>
-              <td class="user-email">john.smith@fidelity.com</td>
-              <td>Today, 08:44</td>
-              <td>
-                <div class="app-chips">
-                  <span class="app-chip chip-doc">Document AI</span>
-                  <span class="app-chip chip-data">Data Q&amp;A</span>
-                </div>
-              </td>
-              <td><span class="status-pill status-active">Active</span></td>
-              <td>
-                <div class="action-group">
-                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
-                  <button class="act-btn act-revoke" onclick="toast('Access revoked for John Smith.','error')">Revoke</button>
-                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
-                </div>
-              </td>
-            </tr>
-            <tr data-status="active" data-apps="Document AI,Report Generator">
-              <td class="user-name">Sarah Johnson</td>
-              <td class="user-email">sarah.johnson@fidelity.com</td>
-              <td>Yesterday, 17:03</td>
-              <td>
-                <div class="app-chips">
-                  <span class="app-chip chip-doc">Document AI</span>
-                  <span class="app-chip chip-rpt">Report Generator</span>
-                </div>
-              </td>
-              <td><span class="status-pill status-active">Active</span></td>
-              <td>
-                <div class="action-group">
-                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
-                  <button class="act-btn act-revoke" onclick="toast('Access revoked for Sarah Johnson.','error')">Revoke</button>
-                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
-                </div>
-              </td>
-            </tr>
-            <tr data-status="active" data-apps="Data Q&amp;A,Report Generator">
-              <td class="user-name">Michael Chen</td>
-              <td class="user-email">michael.chen@fidelity.com</td>
-              <td>Today, 10:55</td>
-              <td>
-                <div class="app-chips">
-                  <span class="app-chip chip-data">Data Q&amp;A</span>
-                  <span class="app-chip chip-rpt">Report Generator</span>
-                </div>
-              </td>
-              <td><span class="status-pill status-active">Active</span></td>
-              <td>
-                <div class="action-group">
-                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
-                  <button class="act-btn act-revoke" onclick="toast('Access revoked for Michael Chen.','error')">Revoke</button>
-                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
-                </div>
-              </td>
-            </tr>
-            <tr data-status="inactive" data-apps="Document AI">
-              <td class="user-name">Lisa Anderson</td>
-              <td class="user-email">lisa.anderson@fidelity.com</td>
-              <td>3 days ago</td>
-              <td>
-                <div class="app-chips">
-                  <span class="app-chip chip-doc">Document AI</span>
-                </div>
-              </td>
-              <td><span class="status-pill status-inactive">Inactive</span></td>
-              <td>
-                <div class="action-group">
-                  <button class="act-btn act-edit" onclick="toast('User settings saved.','success')">Edit</button>
-                  <button class="act-btn act-revoke" onclick="toast('Access revoked for Lisa Anderson.','error')">Revoke</button>
-                  <button class="act-btn act-reset" onclick="toast('Password reset email sent.','info')">Reset PW</button>
-                </div>
-              </td>
-            </tr>
+            <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1102,7 +1091,7 @@ tbody tr:hover { background: var(--green-tint); }
     <div id="section-access" class="section-card" style="display:none;">
       <div class="section-card-header">
         <div class="section-card-title">Access Control</div>
-        <span class="section-card-meta">Toggle per-app access for each user</span>
+        <span class="section-card-meta">Per-user app access overrides</span>
       </div>
 
       <div class="access-header">
@@ -1115,163 +1104,8 @@ tbody tr:hover { background: var(--green-tint); }
         </div>
       </div>
 
-      <div class="access-grid">
-
-        <div class="access-row">
-          <div class="user-name">Platform Admin<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">admin@fidelity.com</span></div>
-          <div class="toggle-cell">
-            <label class="toggle">
-              <input type="checkbox" checked disabled>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle">
-              <input type="checkbox" checked disabled>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle">
-              <input type="checkbox" checked disabled>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div style="text-align:center;">
-            <span style="font-size:11px;color:var(--text-muted);">Admin</span>
-          </div>
-        </div>
-
-        <div class="access-row">
-          <div class="user-name">John Smith<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">john.smith@fidelity.com</span></div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state">Off</span>
-          </div>
-          <div style="text-align:center;">
-            <button class="act-btn act-edit" onclick="toast('Access updated for John Smith.','success')">Save</button>
-          </div>
-        </div>
-
-        <div class="access-row">
-          <div class="user-name">Sarah Johnson<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">sarah.johnson@fidelity.com</span></div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state">Off</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div style="text-align:center;">
-            <button class="act-btn act-edit" onclick="toast('Access updated for Sarah Johnson.','success')">Save</button>
-          </div>
-        </div>
-
-        <div class="access-row">
-          <div class="user-name">Michael Chen<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">michael.chen@fidelity.com</span></div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state">Off</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div style="text-align:center;">
-            <button class="act-btn act-edit" onclick="toast('Access updated for Michael Chen.','success')">Save</button>
-          </div>
-        </div>
-
-        <div class="access-row">
-          <div class="user-name">Lisa Anderson<br><span style="font-size:11px;font-weight:400;color:var(--text-muted);">lisa.anderson@fidelity.com</span></div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox" checked>
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state" style="color:var(--green);">On</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state">Off</span>
-          </div>
-          <div class="toggle-cell">
-            <label class="toggle" onchange="updateToggleLabel(this)">
-              <input type="checkbox">
-              <span class="toggle-track"></span>
-              <span class="toggle-thumb"></span>
-            </label>
-            <span class="toggle-state">Off</span>
-          </div>
-          <div style="text-align:center;">
-            <button class="act-btn act-edit" onclick="toast('Access updated for Lisa Anderson.','success')">Save</button>
-          </div>
-        </div>
-
+      <div class="access-grid" id="accessGrid">
+        <div style="padding:32px;text-align:center;color:var(--text-muted);">Loading…</div>
       </div>
     </div>
 
@@ -1279,7 +1113,7 @@ tbody tr:hover { background: var(--green-tint); }
     <div id="section-analytics" class="section-card" style="display:none;">
       <div class="section-card-header">
         <div class="section-card-title">Usage Analytics</div>
-        <span class="section-card-meta">Current period &mdash; May 2026</span>
+        <span class="section-card-meta" id="usagePeriodLabel">Last 30 days</span>
       </div>
 
       <div class="table-wrapper">
@@ -1294,100 +1128,8 @@ tbody tr:hover { background: var(--green-tint); }
               <th>Total Tokens</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td class="user-name">Platform Admin</td>
-              <td>
-                <span class="token-count">12</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:60%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">8</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:40%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">5</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:25%"></div></div></div>
-              </td>
-              <td><span class="token-count">25</span></td>
-              <td><span class="token-count">18,400</span></td>
-            </tr>
-            <tr>
-              <td class="user-name">John Smith</td>
-              <td>
-                <span class="token-count">7</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:35%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">9</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:45%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">0</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
-              </td>
-              <td><span class="token-count">16</span></td>
-              <td><span class="token-count">9,800</span></td>
-            </tr>
-            <tr>
-              <td class="user-name">Sarah Johnson</td>
-              <td>
-                <span class="token-count">20</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">0</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">14</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div></div>
-              </td>
-              <td><span class="token-count">34</span></td>
-              <td><span class="token-count">24,100</span></td>
-            </tr>
-            <tr>
-              <td class="user-name">Michael Chen</td>
-              <td>
-                <span class="token-count">0</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">18</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:90%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">11</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:55%"></div></div></div>
-              </td>
-              <td><span class="token-count">29</span></td>
-              <td><span class="token-count">19,650</span></td>
-            </tr>
-            <tr>
-              <td class="user-name">Lisa Anderson</td>
-              <td>
-                <span class="token-count">3</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:15%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">0</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
-              </td>
-              <td>
-                <span class="token-count">0</span>
-                <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:0%"></div></div></div>
-              </td>
-              <td><span class="token-count">3</span></td>
-              <td><span class="token-count">2,100</span></td>
-            </tr>
-            <tr style="background:var(--green-tint);font-weight:700;">
-              <td style="color:var(--green);font-weight:700;">Total</td>
-              <td><span class="token-count">42</span></td>
-              <td><span class="token-count">35</span></td>
-              <td><span class="token-count">30</span></td>
-              <td><span class="token-count">107</span></td>
-              <td><span class="token-count">74,050</span></td>
-            </tr>
+          <tbody id="usageBody">
+            <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
           </tbody>
         </table>
       </div>
@@ -1412,214 +1154,653 @@ tbody tr:hover { background: var(--green-tint); }
     </div>
 
     <div class="form-group">
-      <label class="form-label">Full Name</label>
-      <input type="text" class="form-input" id="newUserName" placeholder="e.g., Jane Doe">
+      <label class="form-label">Username</label>
+      <input type="text" class="form-input" id="newUserName" placeholder="e.g. jdoe" autocomplete="off">
     </div>
-
     <div class="form-group">
       <label class="form-label">Email Address</label>
-      <input type="email" class="form-input" id="newUserEmail" placeholder="jane.doe@fidelity.com">
+      <input type="email" class="form-input" id="newUserEmail" placeholder="jdoe@example.com">
     </div>
-
     <div class="form-group">
       <label class="form-label">Role</label>
-      <select class="form-input" id="newUserRole" onchange="handleRoleChange()">
-        <option value="user">User</option>
-        <option value="admin">Admin (Full Access)</option>
+      <select class="form-input" id="newUserRole">
+        <option value="viewer">Viewer</option>
+        <option value="analyst">Analyst</option>
+        <option value="admin">Admin</option>
       </select>
     </div>
-
     <div class="form-group">
-      <label class="form-label">App Access</label>
-      <div class="app-toggles" id="appToggles">
-        <div class="app-toggle-row">
-          <div class="app-toggle-info">
-            <div class="app-toggle-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-            </div>
-            <div>
-              <div class="app-toggle-name">Document AI</div>
-              <div class="app-toggle-desc">PDF &amp; document Q&amp;A</div>
-            </div>
-          </div>
-          <label class="toggle" onchange="updateToggleLabel(this)">
-            <input type="checkbox" class="modal-app-cb">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
-
-        <div class="app-toggle-row">
-          <div class="app-toggle-info">
-            <div class="app-toggle-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <ellipse cx="12" cy="5" rx="9" ry="3"/>
-                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-              </svg>
-            </div>
-            <div>
-              <div class="app-toggle-name">Data Q&amp;A</div>
-              <div class="app-toggle-desc">Natural language to SQL</div>
-            </div>
-          </div>
-          <label class="toggle" onchange="updateToggleLabel(this)">
-            <input type="checkbox" class="modal-app-cb">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
-
-        <div class="app-toggle-row">
-          <div class="app-toggle-info">
-            <div class="app-toggle-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="20" x2="18" y2="10"/>
-                <line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6"  y1="20" x2="6"  y2="14"/>
-                <line x1="2"  y1="20" x2="22" y2="20"/>
-              </svg>
-            </div>
-            <div>
-              <div class="app-toggle-name">Report Generator</div>
-              <div class="app-toggle-desc">AI-assisted BI reports</div>
-            </div>
-          </div>
-          <label class="toggle" onchange="updateToggleLabel(this)">
-            <input type="checkbox" class="modal-app-cb">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
-          </label>
-        </div>
-      </div>
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="newUserPassword" placeholder="Min 8 characters" autocomplete="new-password">
     </div>
 
     <div class="modal-actions">
-      <button class="modal-btn modal-btn-primary" onclick="saveUser()">Add User</button>
-      <button class="modal-btn modal-btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="saveNewUser()">Add User</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EDIT USER MODAL ══ -->
+<div id="editModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <div class="modal-title-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/>
+          <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/>
+        </svg>
+      </div>
+      Edit User
+    </div>
+
+    <input type="hidden" id="editUsername">
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <div id="editUsernameDisplay" style="font-size:14px;font-weight:600;color:var(--text);padding:9px 0;"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <select class="form-input" id="editRole">
+        <option value="viewer">Viewer</option>
+        <option value="analyst">Analyst</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" onclick="saveEdit()">Save Role</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+      <button class="modal-btn modal-btn-danger" id="editDeleteBtn" onclick="deleteFromModal()">Delete User</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESET PASSWORD MODAL ══ -->
+<div id="resetPwModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      <div class="modal-title-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      Reset Password
+    </div>
+
+    <input type="hidden" id="resetPwUsername">
+    <div class="form-group">
+      <label class="form-label">User</label>
+      <div id="resetPwUsernameDisplay" style="font-size:14px;font-weight:600;color:var(--text);padding:9px 0;"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input type="password" class="form-input" id="resetPwNew" placeholder="Min 8 characters" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm Password</label>
+      <input type="password" class="form-input" id="resetPwConfirm" placeholder="Repeat password" autocomplete="new-password">
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+      <input type="checkbox" id="resetPwForce" checked style="width:16px;height:16px;accent-color:var(--green);">
+      <label for="resetPwForce" style="font-size:13px;color:var(--text-mid);cursor:pointer;">Require password change on next login</label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-primary" onclick="saveResetPw()">Reset Password</button>
+      <button class="modal-btn modal-btn-secondary" onclick="closeModal('resetPwModal')">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ── Navigation ── */
-function showSection(name, btn) {
-  ['users','access','analytics'].forEach(function(s) {
-    document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
+'use strict';
+
+/* ── State ── */
+let TOKEN = sessionStorage.getItem('admin_token');
+let CURRENT_USER = sessionStorage.getItem('admin_user');
+let allUsers = [];
+
+/* ── Bootstrap ── */
+document.addEventListener('DOMContentLoaded', () => {
+  if (TOKEN) {
+    showDashboard();
+    initDashboard();
+  } else {
+    showLogin();
+  }
+  // Close modals on backdrop click
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
   });
-  document.querySelectorAll('.nav-link').forEach(function(l) { l.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-}
-/* Ensure correct initial state on load */
-document.addEventListener('DOMContentLoaded', function() {
-  showSection('users', document.querySelector('.nav-link.active'));
 });
 
-/* ── Sidebar refresh spin ── */
-function refreshUsage(btn) {
-  btn.style.transition = 'transform 0.5s ease';
-  btn.style.transform = 'rotate(360deg)';
-  setTimeout(function() { btn.style.transition = ''; btn.style.transform = ''; }, 550);
+/* ── Auth ── */
+function showLogin() {
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('dashboardLayout').style.display = 'none';
+}
+function showDashboard() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('dashboardLayout').style.display = 'flex';
 }
 
-/* ── Toast ── */
-function toast(message, type) {
-  type = type || 'success';
-  var icons = {
-    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-  };
-  var el = document.createElement('div');
-  el.className = 'toast toast-' + type;
-  el.innerHTML = '<span class="toast-icon">' + icons[type] + '</span><span>' + message + '</span><button class="toast-dismiss" onclick="dismissToast(this.parentElement)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
-  document.getElementById('toast-container').appendChild(el);
-  setTimeout(function() { dismissToast(el); }, 4000);
+async function doLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginBtn');
+
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  try {
+    const res  = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.error || 'Login failed';
+      errEl.style.display = 'block';
+      return;
+    }
+    TOKEN = data.token;
+    CURRENT_USER = data.username;
+    sessionStorage.setItem('admin_token', TOKEN);
+    sessionStorage.setItem('admin_user', CURRENT_USER);
+    showDashboard();
+    initDashboard();
+  } catch (_) {
+    errEl.textContent = 'Connection error — is the API running?';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
 }
 
-function dismissToast(el) {
-  if (!el || !el.parentElement) return;
-  el.style.animation = 'toastOut 0.2s ease forwards';
-  setTimeout(function() { if (el.parentElement) el.parentElement.removeChild(el); }, 220);
+async function doLogout() {
+  try { await apiFetch('/api/logout', { method: 'POST' }); } catch (_) {}
+  TOKEN = null;
+  CURRENT_USER = null;
+  sessionStorage.removeItem('admin_token');
+  sessionStorage.removeItem('admin_user');
+  showLogin();
 }
 
-/* ── Modal ── */
-function openModal() {
+/* ── API helpers ── */
+async function apiFetch(path, opts = {}) {
+  const headers = { 'Authorization': `Bearer ${TOKEN}` };
+  if (opts.body) headers['Content-Type'] = 'application/json';
+  const res = await fetch(path, { ...opts, headers: { ...headers, ...(opts.headers || {}) } });
+  if (res.status === 401) {
+    sessionStorage.removeItem('admin_token');
+    sessionStorage.removeItem('admin_user');
+    showLogin();
+    return null;
+  }
+  return res;
+}
+
+async function apiGet(path) {
+  const res = await apiFetch(path);
+  if (!res || !res.ok) return null;
+  return res.json();
+}
+
+async function apiAction(path, method, body) {
+  const res = await apiFetch(path, { method, body: body ? JSON.stringify(body) : undefined });
+  if (!res) return false;
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    toast(err.error || 'Action failed', 'error');
+    return false;
+  }
+  return true;
+}
+
+/* ── Dashboard init ── */
+async function initDashboard() {
+  if (CURRENT_USER) {
+    document.getElementById('sidebarUserLabel').textContent = CURRENT_USER;
+  }
+  loadStats();
+  loadUsers();
+}
+
+/* ── Stats ── */
+async function loadStats() {
+  const stats = await apiGet('/api/stats');
+  if (!stats) return;
+
+  document.getElementById('statTotalUsers').textContent    = stats.total_users;
+  document.getElementById('statActiveUsers').textContent   = stats.active_users;
+  document.getElementById('statRequestsToday').textContent = stats.today_requests;
+  document.getElementById('statTokensToday').textContent   = stats.today_tokens.toLocaleString();
+
+  document.getElementById('sidebarActiveUsers').textContent    = `${stats.active_users} / ${stats.total_users}`;
+  document.getElementById('sidebarRequestsToday').textContent  = `${stats.today_requests}`;
+
+  const activePct = stats.total_users ? Math.round(stats.active_users / stats.total_users * 100) : 0;
+  document.getElementById('sidebarActiveUsersBar').style.width  = `${activePct}%`;
+  document.getElementById('sidebarRequestsBar').style.width     = stats.today_requests > 0 ? '100%' : '0%';
+}
+
+/* ── Users ── */
+async function loadUsers() {
+  allUsers = await apiGet('/api/users');
+  if (!allUsers) return;
+  renderUserTable(allUsers);
+  renderAccessGrid(allUsers);
+}
+
+const APP_LABELS = {
+  document_intelligence: 'Document AI',
+  data_qa: 'Data Q&A',
+  report_generator: 'Report Generator',
+};
+const APP_CHIP_CLASSES = {
+  document_intelligence: 'chip-doc',
+  data_qa: 'chip-data',
+  report_generator: 'chip-rpt',
+};
+
+function renderAppChips(appAccess) {
+  const active = Object.entries(appAccess).filter(([, v]) => v);
+  if (active.length === Object.keys(appAccess).length && active.length > 0) {
+    return '<span class="app-chip chip-all">All Apps</span>';
+  }
+  if (active.length === 0) {
+    return '<span class="app-chip chip-none">No Access</span>';
+  }
+  return active.map(([k]) =>
+    `<span class="app-chip ${APP_CHIP_CLASSES[k] || ''}">${esc(APP_LABELS[k] || k)}</span>`
+  ).join('');
+}
+
+function renderUserTable(users) {
+  const tbody = document.getElementById('usersBody');
+  document.getElementById('userMeta').textContent =
+    `${users.length} users · ${users.filter(u => u.is_active).length} active`;
+
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">No users found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  users.forEach(u => {
+    const activeApps = Object.entries(u.app_access).filter(([, v]) => v)
+      .map(([k]) => APP_LABELS[k] || k);
+
+    const tr = document.createElement('tr');
+    tr.dataset.status = u.is_active ? 'active' : 'inactive';
+    tr.dataset.apps   = activeApps.join(',');
+
+    const pwWarn = u.must_change_password
+      ? '<span style="font-size:10px;color:#d97706;margin-left:4px;" title="Must change password">⚠</span>'
+      : '';
+
+    const actions = u.username !== CURRENT_USER
+      ? `<button class="act-btn act-edit" onclick="openEditModal('${esc(u.username)}')">Edit</button>
+         <button class="act-btn ${u.is_active ? 'act-revoke' : 'act-activate'}" onclick="toggleActive('${esc(u.username)}',${u.is_active})">${u.is_active ? 'Deactivate' : 'Activate'}</button>
+         <button class="act-btn act-reset" onclick="openResetPwModal('${esc(u.username)}')">Reset PW</button>`
+      : `<button class="act-btn act-edit" onclick="openEditModal('${esc(u.username)}')">Edit</button>
+         <span style="font-size:11px;color:var(--text-muted);">you</span>`;
+
+    tr.innerHTML = `
+      <td>
+        <div class="user-name">${esc(u.username)}${pwWarn}</div>
+        <div class="user-email">${esc(u.role)}</div>
+      </td>
+      <td class="user-email">${esc(u.email)}</td>
+      <td>${fmtDate(u.last_login)}</td>
+      <td><div class="app-chips">${renderAppChips(u.app_access)}</div></td>
+      <td><span class="status-pill ${u.is_active ? 'status-active' : 'status-inactive'}">${u.is_active ? 'Active' : 'Inactive'}</span></td>
+      <td><div class="action-group">${actions}</div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderAccessGrid(users) {
+  const grid = document.getElementById('accessGrid');
+  const APP_KEYS = ['document_intelligence', 'data_qa', 'report_generator'];
+
+  if (!users.length) {
+    grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">No users.</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  users.forEach(u => {
+    const row = document.createElement('div');
+    row.className = 'access-row';
+    row.dataset.username = u.username;
+
+    const isAdmin = u.role === 'admin';
+    const toggles = APP_KEYS.map(appKey => {
+      const checked   = u.app_access[appKey] ? 'checked' : '';
+      const disabled  = isAdmin ? 'disabled' : '';
+      const stateColor = u.app_access[appKey] ? 'style="color:var(--green);"' : '';
+      return `
+        <div class="toggle-cell">
+          <label class="toggle" onchange="updateToggleLabel(this)">
+            <input type="checkbox" ${checked} ${disabled} data-app="${appKey}">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </label>
+          <span class="toggle-state" ${stateColor}>${u.app_access[appKey] ? 'On' : 'Off'}</span>
+        </div>`;
+    }).join('');
+
+    const saveCell = isAdmin
+      ? '<span style="font-size:11px;color:var(--text-muted);">Admin</span>'
+      : `<button class="act-btn act-edit" onclick="saveAccess('${esc(u.username)}')">Save</button>`;
+
+    row.innerHTML = `
+      <div class="user-name">${esc(u.username)}<br>
+        <span style="font-size:11px;font-weight:400;color:var(--text-muted);">${esc(u.email)}</span>
+      </div>
+      ${toggles}
+      <div style="text-align:center;">${saveCell}</div>
+    `;
+    grid.appendChild(row);
+  });
+}
+
+/* ── User actions ── */
+async function toggleActive(username, currentlyActive) {
+  const ok = await apiAction(`/api/users/${encodeURIComponent(username)}`, 'PATCH',
+    { is_active: !currentlyActive });
+  if (ok) {
+    toast(`${username} ${currentlyActive ? 'deactivated' : 'activated'}.`, 'success');
+    loadUsers();
+    loadStats();
+  }
+}
+
+async function saveAccess(username) {
+  const row = document.querySelector(`.access-row[data-username="${username}"]`);
+  if (!row) return;
+  const app_access = {};
+  row.querySelectorAll('input[data-app]').forEach(cb => {
+    app_access[cb.dataset.app] = cb.checked;
+  });
+  const ok = await apiAction(`/api/users/${encodeURIComponent(username)}/access`, 'PATCH', { app_access });
+  if (ok) {
+    toast(`Access updated for ${username}.`, 'success');
+    loadUsers();
+  }
+}
+
+async function deleteUser(username) {
+  if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return;
+  const ok = await apiAction(`/api/users/${encodeURIComponent(username)}`, 'DELETE');
+  if (ok) {
+    toast(`User "${username}" deleted.`, 'success');
+    closeModal('editModal');
+    loadUsers();
+    loadStats();
+  }
+}
+
+/* ── Edit modal ── */
+function openEditModal(username) {
+  const u = allUsers.find(x => x.username === username);
+  if (!u) return;
+  document.getElementById('editUsername').value         = u.username;
+  document.getElementById('editUsernameDisplay').textContent = u.username;
+  document.getElementById('editRole').value             = u.role;
+  document.getElementById('editDeleteBtn').style.display =
+    u.username === CURRENT_USER ? 'none' : '';
+  document.getElementById('editModal').classList.add('active');
+}
+
+async function saveEdit() {
+  const username = document.getElementById('editUsername').value;
+  const role     = document.getElementById('editRole').value;
+  const ok = await apiAction(`/api/users/${encodeURIComponent(username)}`, 'PATCH', { role });
+  if (ok) {
+    toast(`Role updated for ${username}.`, 'success');
+    closeModal('editModal');
+    loadUsers();
+  }
+}
+
+function deleteFromModal() {
+  const username = document.getElementById('editUsername').value;
+  deleteUser(username);
+}
+
+/* ── Add User modal ── */
+function openAddUserModal() {
+  document.getElementById('newUserName').value     = '';
+  document.getElementById('newUserEmail').value    = '';
+  document.getElementById('newUserPassword').value = '';
+  document.getElementById('newUserRole').value     = 'viewer';
   document.getElementById('addUserModal').classList.add('active');
 }
-function closeModal() {
-  document.getElementById('addUserModal').classList.remove('active');
-}
-document.getElementById('addUserModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
 
-function handleRoleChange() {
-  var isAdmin = document.getElementById('newUserRole').value === 'admin';
-  document.querySelectorAll('.modal-app-cb').forEach(function(cb) {
-    cb.checked = isAdmin;
-    cb.disabled = isAdmin;
-  });
-}
+async function saveNewUser() {
+  const username = document.getElementById('newUserName').value.trim().toLowerCase();
+  const email    = document.getElementById('newUserEmail').value.trim().toLowerCase();
+  const password = document.getElementById('newUserPassword').value;
+  const role     = document.getElementById('newUserRole').value;
 
-function saveUser() {
-  var name = document.getElementById('newUserName').value.trim();
-  if (!name) { toast('Please enter a name.', 'error'); return; }
-  toast('User "' + name + '" added successfully.', 'success');
-  closeModal();
-  document.getElementById('newUserName').value = '';
-  document.getElementById('newUserEmail').value = '';
+  if (!username || !email || !password) { toast('All fields are required.', 'error'); return; }
+  if (password.length < 8) { toast('Password must be at least 8 characters.', 'error'); return; }
+
+  const res = await apiFetch('/api/users', { method: 'POST',
+    body: JSON.stringify({ username, email, password, role }) });
+  if (!res) return;
+  const data = await res.json();
+  if (!res.ok) { toast(data.error || 'Failed to create user.', 'error'); return; }
+  toast(`User "${username}" created.`, 'success');
+  closeModal('addUserModal');
+  loadUsers();
+  loadStats();
 }
 
-/* ── Toggle label sync ── */
-function updateToggleLabel(label) {
-  var cb = label.querySelector('input');
-  var state = label.parentElement.querySelector('.toggle-state');
-  if (!state) return;
-  if (cb.checked) {
-    state.textContent = 'On';
-    state.style.color = 'var(--green)';
-  } else {
-    state.textContent = 'Off';
-    state.style.color = '';
+/* ── Reset Password modal ── */
+function openResetPwModal(username) {
+  document.getElementById('resetPwUsername').value          = username;
+  document.getElementById('resetPwUsernameDisplay').textContent = username;
+  document.getElementById('resetPwNew').value     = '';
+  document.getElementById('resetPwConfirm').value = '';
+  document.getElementById('resetPwForce').checked = true;
+  document.getElementById('resetPwModal').classList.add('active');
+}
+
+async function saveResetPw() {
+  const username     = document.getElementById('resetPwUsername').value;
+  const password     = document.getElementById('resetPwNew').value;
+  const confirm      = document.getElementById('resetPwConfirm').value;
+  const force_change = document.getElementById('resetPwForce').checked;
+
+  if (password !== confirm) { toast('Passwords do not match.', 'error'); return; }
+  if (password.length < 8)  { toast('Password must be at least 8 characters.', 'error'); return; }
+
+  const ok = await apiAction(`/api/users/${encodeURIComponent(username)}/password`,
+    'POST', { password, force_change });
+  if (ok) {
+    toast(`Password reset for ${username}.`, 'success');
+    closeModal('resetPwModal');
   }
+}
+
+/* ── Usage ── */
+async function loadUsage() {
+  const data = await apiGet('/api/usage?days=30');
+  if (data === null) return;
+  renderUsageTable(data);
+}
+
+function renderUsageTable(data) {
+  const today = new Date();
+  const from  = new Date(today); from.setDate(from.getDate() - 30);
+  document.getElementById('usagePeriodLabel').textContent =
+    `${from.toLocaleDateString([], {month:'short',day:'numeric'})} – ${today.toLocaleDateString([], {month:'short',day:'numeric'})}`;
+
+  const byUser = {};
+  data.forEach(row => {
+    if (!byUser[row.username]) byUser[row.username] = { doc: 0, qa: 0, rpt: 0, total_requests: 0, total_tokens: 0 };
+    const u = byUser[row.username];
+    if (row.app_name === 'document_intelligence') u.doc += row.total_requests;
+    if (row.app_name === 'data_qa')               u.qa  += row.total_requests;
+    if (row.app_name === 'report_generator')      u.rpt += row.total_requests;
+    u.total_requests += row.total_requests;
+    u.total_tokens   += row.total_tokens;
+  });
+
+  const tbody = document.getElementById('usageBody');
+  const entries = Object.entries(byUser).sort((a, b) => b[1].total_tokens - a[1].total_tokens);
+
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">No usage in the last 30 days.</td></tr>';
+    return;
+  }
+
+  const maxTok = Math.max(...entries.map(([, u]) => u.total_tokens), 1);
+  let totalReq = 0, totalTok = 0;
+  let rows = '';
+
+  entries.forEach(([uname, u]) => {
+    totalReq += u.total_requests;
+    totalTok += u.total_tokens;
+    const pct = Math.round(u.total_tokens / maxTok * 100);
+    rows += `
+      <tr>
+        <td class="user-name">${esc(uname)}</td>
+        <td><span class="token-count">${u.doc}</span></td>
+        <td><span class="token-count">${u.qa}</span></td>
+        <td><span class="token-count">${u.rpt}</span></td>
+        <td><span class="token-count">${u.total_requests}</span></td>
+        <td>
+          <span class="token-count">${u.total_tokens.toLocaleString()}</span>
+          <div class="bar-cell"><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div></div>
+        </td>
+      </tr>`;
+  });
+
+  rows += `
+    <tr style="background:var(--green-tint);font-weight:700;">
+      <td style="color:var(--green);font-weight:700;">Total</td>
+      <td colspan="3"></td>
+      <td><span class="token-count">${totalReq}</span></td>
+      <td><span class="token-count">${totalTok.toLocaleString()}</span></td>
+    </tr>`;
+
+  tbody.innerHTML = rows;
+}
+
+/* ── Navigation ── */
+function showSection(name, btn) {
+  ['users', 'access', 'analytics'].forEach(s => {
+    document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (name === 'analytics') loadUsage();
+}
+
+/* ── Modals ── */
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
 }
 
 /* ── Search / Filter ── */
 function filterUsers() {
-  var q = document.getElementById('userSearch').value.toLowerCase();
-  var status = document.getElementById('statusFilter').value;
-  var app = document.getElementById('appFilter').value;
-  document.querySelectorAll('#usersBody tr').forEach(function(row) {
-    var text = row.textContent.toLowerCase();
-    var rowStatus = row.dataset.status || '';
-    var rowApps = row.dataset.apps || '';
-    var matchQ = !q || text.indexOf(q) !== -1;
-    var matchStatus = !status || rowStatus === status;
-    var matchApp = !app || rowApps.indexOf(app) !== -1;
+  const q      = document.getElementById('userSearch').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const app    = document.getElementById('appFilter').value;
+  document.querySelectorAll('#usersBody tr').forEach(row => {
+    const text      = row.textContent.toLowerCase();
+    const rowStatus = row.dataset.status || '';
+    const rowApps   = row.dataset.apps   || '';
+    const matchQ      = !q      || text.includes(q);
+    const matchStatus = !status || rowStatus === status;
+    const matchApp    = !app    || rowApps.includes(app);
     row.style.display = (matchQ && matchStatus && matchApp) ? '' : 'none';
   });
 }
 
 /* ── Sort ── */
-var sortCol = -1, sortAsc = true;
+let sortCol = -1, sortAsc = true;
 function sortTable(col) {
-  var tbody = document.getElementById('usersBody');
-  var rows = Array.from(tbody.querySelectorAll('tr'));
-  if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
-  rows.sort(function(a, b) {
-    var at = a.cells[col] ? a.cells[col].textContent.trim() : '';
-    var bt = b.cells[col] ? b.cells[col].textContent.trim() : '';
+  const tbody = document.getElementById('usersBody');
+  const rows  = [...tbody.querySelectorAll('tr')];
+  if (sortCol === col) sortAsc = !sortAsc; else { sortCol = col; sortAsc = true; }
+  rows.sort((a, b) => {
+    const at = a.cells[col]?.textContent.trim() || '';
+    const bt = b.cells[col]?.textContent.trim() || '';
     return sortAsc ? at.localeCompare(bt) : bt.localeCompare(at);
   });
-  rows.forEach(function(r) { tbody.appendChild(r); });
-  document.querySelectorAll('th').forEach(function(th, i) {
-    th.classList.remove('sort-asc','sort-desc');
+  rows.forEach(r => tbody.appendChild(r));
+  document.querySelectorAll('th').forEach((th, i) => {
+    th.classList.remove('sort-asc', 'sort-desc');
     if (i === col) th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
   });
+}
+
+/* ── Toggle label sync ── */
+function updateToggleLabel(label) {
+  const cb    = label.querySelector('input');
+  const state = label.parentElement.querySelector('.toggle-state');
+  if (!state) return;
+  state.textContent = cb.checked ? 'On' : 'Off';
+  state.style.color = cb.checked ? 'var(--green)' : '';
+}
+
+/* ── Refresh sidebar ── */
+function refreshStats(btn) {
+  btn.style.transition = 'transform 0.5s ease';
+  btn.style.transform  = 'rotate(360deg)';
+  setTimeout(() => { btn.style.transition = ''; btn.style.transform = ''; loadStats(); }, 550);
+}
+
+/* ── Helpers ── */
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  try {
+    const d    = new Date(iso);
+    const now  = new Date();
+    const diff = now - d;
+    if (diff < 86400000)  return 'Today, ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (diff < 172800000) return 'Yesterday';
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (_) { return iso; }
+}
+
+/* ── Toast ── */
+function toast(message, type = 'success') {
+  const ICONS = {
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    info:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  };
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span class="toast-icon">${ICONS[type] || ICONS.info}</span><span>${message}</span><button class="toast-dismiss" onclick="dismissToast(this.parentElement)">&times;</button>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => dismissToast(el), 4000);
+}
+
+function dismissToast(el) {
+  if (!el?.parentElement) return;
+  el.style.animation = 'toastOut 0.2s ease forwards';
+  setTimeout(() => el.parentElement?.removeChild(el), 220);
 }
 </script>
 </body>

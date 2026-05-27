@@ -1,0 +1,20 @@
+[Unit]
+Description=FI GenAI Admin REST API (Port 8505)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/python apps/api/app.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/api.log
+StandardError=append:/var/log/streamlit/api-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target
