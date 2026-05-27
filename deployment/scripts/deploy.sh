@@ -113,16 +113,23 @@ for port in 8501 8502 8503; do
   fi
 done
 
-# ── Step 11: Health check — admin REST API (warn-only) ───────────────────────
+# ── Step 11: Health check — admin REST API (warn-only, with retry) ───────────
 log "Checking Admin REST API (port 8505)..."
-if curl --silent --fail --max-time 10 "http://localhost:8505/api/health" > /dev/null 2>&1; then
-  log "Port 8505 (API): OK"
-else
-  log "WARNING: Admin REST API (port 8505) not ready — check: journalctl -u fi-genai-api -n 30"
+API_READY=false
+for attempt in 1 2 3 4 5; do
+  if curl --silent --fail --max-time 10 "http://localhost:8505/api/health" > /dev/null 2>&1; then
+    log "Port 8505 (API): OK (attempt $attempt)"
+    API_READY=true
+    break
+  fi
+  log "Port 8505 not ready yet (attempt $attempt/5) — waiting 5s..."
+  sleep 5
+done
+if ! $API_READY; then
+  log "WARNING: Admin REST API (port 8505) not ready after 5 attempts — check: journalctl -u fi-genai-api -n 30"
 fi
 
-# ── Step 12: Success notification ────────────────────────────────────────────
+# ── Step 12: Done ─────────────────────────────────────────────────────────────
+# Success notification is sent by the GitHub Actions workflow step.
 log "All core health checks passed."
-python3 deployment/email/notify.py "SUCCESS" \
-  "All 3 apps running — deploy complete (commit: $(git rev-parse --short HEAD))" || true
 log "=== Deployment complete ==="
