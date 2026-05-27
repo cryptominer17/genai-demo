@@ -49,7 +49,6 @@ echo "--- Systemd Services ---"
 check_service "streamlit-doc-intelligence"  "svc_doc_intelligence"
 check_service "streamlit-data-qa"           "svc_data_qa"
 check_service "streamlit-report-generator"  "svc_report_generator"
-check_service "streamlit-admin"             "svc_admin"
 check_service "fi-genai-api"                "svc_api"
 
 # ------------------------------------------------------------------ #
@@ -78,7 +77,6 @@ check_port() {
 check_port 8501 "port_8501" "Document Intelligence" "/Document_AI/"
 check_port 8502 "port_8502" "Data Q&A"              "/Text_to_SQL/"
 check_port 8503 "port_8503" "Report Generator"      "/BI_Dashboard/"
-check_port 8504 "port_8504" "Admin Panel"           "/Admin/"
 check_port 8505 "port_8505" "Admin REST API"        "/api/health"
 
 # ------------------------------------------------------------------ #
@@ -131,7 +129,6 @@ check_error_log() {
 check_error_log "${LOG_DIR}/doc-intelligence-error.log"  "log_doc"  "Document Intelligence"
 check_error_log "${LOG_DIR}/data-qa-error.log"           "log_qa"   "Data Q&A"
 check_error_log "${LOG_DIR}/report-generator-error.log"  "log_rpt"  "Report Generator"
-check_error_log "${LOG_DIR}/admin-error.log"             "log_admin" "Admin Panel"
 check_error_log "${LOG_DIR}/api-error.log"               "log_api"   "Admin REST API"
 
 # ------------------------------------------------------------------ #
