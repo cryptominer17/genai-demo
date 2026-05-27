@@ -396,7 +396,10 @@ with tab_charts:
         fig = go.Figure()
 
         # Actual line (where available)
-        actual_rows = forecast_df[forecast_df["actual"].notna()]
+        if "actual" in forecast_df.columns:
+            actual_rows = forecast_df[forecast_df["actual"].notna()]
+        else:
+            actual_rows = pd.DataFrame()
         if not actual_rows.empty:
             fig.add_trace(go.Scatter(
                 x=actual_rows["month"],
@@ -529,7 +532,10 @@ with tab_charts:
         st.markdown("**Sales Forecast Trend**")
         forecast_df = load_forecast_data()
         fig2 = go.Figure()
-        actual_rows = forecast_df[forecast_df["actual"].notna()]
+        if "actual" in forecast_df.columns:
+            actual_rows = forecast_df[forecast_df["actual"].notna()]
+        else:
+            actual_rows = pd.DataFrame()
         if not actual_rows.empty:
             fig2.add_trace(go.Scatter(
                 x=actual_rows["month"], y=actual_rows["actual"],
