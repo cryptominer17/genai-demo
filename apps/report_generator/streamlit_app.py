@@ -13,6 +13,7 @@ import os
 # `from shared.xxx import yyy` works regardless of launch directory.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
+import io
 import json
 import textwrap
 
@@ -207,6 +208,12 @@ DEPTH_INSTRUCTIONS = {
 }
 
 # ---------------------------------------------------------------------------
+# Session state
+# ---------------------------------------------------------------------------
+if "report_cache" not in st.session_state:
+    st.session_state.report_cache = {}  # key → report_text
+
+# ---------------------------------------------------------------------------
 # Sidebar: report configuration
 # ---------------------------------------------------------------------------
 with st.sidebar:
@@ -214,8 +221,58 @@ with st.sidebar:
     st.caption(f"Logged in as: {username} ({st.session_state.get('role', '')})")
     st.divider()
 
-    report_type = st.selectbox("Report type", REPORT_TYPES)
+    # Build available report types dynamically based on uploaded data
+    upload_present = (
+        "uploaded_df" in st.session_state or "uploaded_json" in st.session_state
+    )
+    available_report_types = REPORT_TYPES + (["Custom Uploaded Data"] if upload_present else [])
+    report_type = st.selectbox("Report type", available_report_types)
     st.caption("Time period: Q1 2024")
+
+    # -----------------------------------------------------------------------
+    # Upload section
+    # -----------------------------------------------------------------------
+    st.subheader("Upload custom data (optional)")
+    uploaded_file = st.file_uploader(
+        "Choose a CSV or JSON file",
+        type=["csv", "json"],
+        accept_multiple_files=False,
+    )
+
+    if uploaded_file is not None:
+        if uploaded_file.size > 5 * 1024 * 1024:
+            st.warning(
+                f"File '{uploaded_file.name}' exceeds the 5 MB limit and was not loaded."
+            )
+        else:
+            file_ext = uploaded_file.name.rsplit(".", 1)[-1].lower()
+            if file_ext == "csv":
+                df_uploaded = pd.read_csv(io.BytesIO(uploaded_file.read()))
+                st.session_state["uploaded_df"] = df_uploaded
+                st.session_state.pop("uploaded_json", None)
+                st.success(
+                    f"Loaded '{uploaded_file.name}' — {len(df_uploaded):,} rows."
+                )
+                st.dataframe(df_uploaded.head(10), use_container_width=True)
+            elif file_ext == "json":
+                json_data = json.loads(uploaded_file.read())
+                st.session_state["uploaded_json"] = json_data
+                st.session_state.pop("uploaded_df", None)
+                key_count = len(json_data) if isinstance(json_data, dict) else len(json_data)
+                st.success(
+                    f"Loaded '{uploaded_file.name}' — {key_count} top-level keys/items."
+                )
+                if isinstance(json_data, dict):
+                    preview = dict(list(json_data.items())[:5])
+                else:
+                    preview = json_data[:5]
+                st.json(preview)
+
+    if "uploaded_df" in st.session_state or "uploaded_json" in st.session_state:
+        if st.button("Clear uploaded data", use_container_width=True):
+            st.session_state.pop("uploaded_df", None)
+            st.session_state.pop("uploaded_json", None)
+            st.rerun()
 
     st.divider()
 
@@ -225,12 +282,6 @@ with st.sidebar:
     st.divider()
 
     generate_button = st.button("Generate Report", type="primary", use_container_width=True)
-
-# ---------------------------------------------------------------------------
-# Session state
-# ---------------------------------------------------------------------------
-if "report_cache" not in st.session_state:
-    st.session_state.report_cache = {}  # key → report_text
 
 report_cache_key = f"{report_type}::{audience}::{report_depth}"
 
@@ -245,48 +296,62 @@ if generate_button:
         report_depth,
     )
 
-    data_string, _ = get_report_data(report_type)
+    if report_type == "Custom Uploaded Data":
+        if "uploaded_df" in st.session_state:
+            data_string = st.session_state["uploaded_df"].to_string(index=False)
+        elif "uploaded_json" in st.session_state:
+            data_string = json.dumps(st.session_state["uploaded_json"], indent=2)
+        else:
+            st.error("No uploaded data found. Please upload a CSV or JSON file first.")
+            data_string = None
 
-    system_prompt = (
-        "You are a business intelligence analyst at Fidelity Institutional. "
-        "Generate professional reports. Use headers, bullets, and callouts. "
-        "Highlight key insights, trends, and recommendations. "
-        "Write in a professional financial services tone."
-    )
-
-    depth_instruction = DEPTH_INSTRUCTIONS[report_depth]
-    audience_note = f"The audience for this report is: {audience}. Tailor language and detail accordingly."
-
-    user_prompt = textwrap.dedent(f"""
-        Generate a {report_type} report.
-
-        {audience_note}
-
-        {depth_instruction}
-
-        Use the following data as your source:
-
-        {data_string}
-
-        Start the report directly — do not include a preamble about what you are about to do.
-    """).strip()
+        system_prompt = (
+            "You are a business intelligence analyst. The user has uploaded their own dataset. "
+            "Analyze it, identify the top 3-5 business insights, and write a narrative report "
+            "appropriate for the selected audience and depth."
+        )
+    else:
+        data_string, _ = get_report_data(report_type)
+        system_prompt = (
+            "You are a business intelligence analyst at Fidelity Institutional. "
+            "Generate professional reports. Use headers, bullets, and callouts. "
+            "Highlight key insights, trends, and recommendations. "
+            "Write in a professional financial services tone."
+        )
 
     if report_cache_key in st.session_state.report_cache:
         # Use cached version, but force regeneration if button was explicitly clicked
         pass
 
-    with st.spinner(f"Generating {report_type}…"):
-        try:
-            report_text, tokens = llm.query_with_usage(
-                prompt=user_prompt,
-                system_message=system_prompt,
-                max_tokens=3000,
-            )
-            if tokens > 0:
-                user_db.record_usage(username, "report_generator", tokens)
-            st.session_state.report_cache[report_cache_key] = report_text
-        except Exception as exc:  # noqa: BLE001
-            st.error(f"Error generating report: {exc}")
+    if data_string is not None:
+        depth_instruction = DEPTH_INSTRUCTIONS[report_depth]
+        audience_note = f"The audience for this report is: {audience}. Tailor language and detail accordingly."
+
+        user_prompt = textwrap.dedent(f"""
+            Generate a {report_type} report.
+
+            {audience_note}
+
+            {depth_instruction}
+
+            Use the following data as your source:
+
+            {data_string}
+
+            Start the report directly — do not include a preamble about what you are about to do.
+        """).strip()
+        with st.spinner(f"Generating {report_type}…"):
+            try:
+                report_text, tokens = llm.query_with_usage(
+                    prompt=user_prompt,
+                    system_message=system_prompt,
+                    max_tokens=3000,
+                )
+                if tokens > 0:
+                    user_db.record_usage(username, "report_generator", tokens)
+                st.session_state.report_cache[report_cache_key] = report_text
+            except Exception as exc:  # noqa: BLE001
+                st.error(f"Error generating report: {exc}")
 
 # ---------------------------------------------------------------------------
 # Retrieve cached report (if any) for current config
@@ -329,20 +394,29 @@ with tab_report:
 # ===========================================================================
 with tab_data:
     st.subheader(f"Source data: {report_type}")
-    _, raw_data = get_report_data(report_type)
 
-    if isinstance(raw_data, pd.DataFrame):
-        st.dataframe(raw_data, use_container_width=True)
-    elif isinstance(raw_data, dict):
-        if report_type == "Executive Board Deck Summary":
-            # Multi-section display
-            for section, section_data in raw_data.items():
-                with st.expander(section, expanded=True):
-                    st.json(section_data)
+    if report_type == "Custom Uploaded Data":
+        if "uploaded_df" in st.session_state:
+            st.dataframe(st.session_state["uploaded_df"], use_container_width=True)
+        elif "uploaded_json" in st.session_state:
+            st.json(st.session_state["uploaded_json"])
         else:
-            st.json(raw_data)
+            st.info("No uploaded data in this session. Upload a file using the sidebar.")
     else:
-        st.write(raw_data)
+        _, raw_data = get_report_data(report_type)
+
+        if isinstance(raw_data, pd.DataFrame):
+            st.dataframe(raw_data, use_container_width=True)
+        elif isinstance(raw_data, dict):
+            if report_type == "Executive Board Deck Summary":
+                # Multi-section display
+                for section, section_data in raw_data.items():
+                    with st.expander(section, expanded=True):
+                        st.json(section_data)
+            else:
+                st.json(raw_data)
+        else:
+            st.write(raw_data)
 
 # ===========================================================================
 # Tab 3 — Charts
@@ -350,8 +424,15 @@ with tab_data:
 with tab_charts:
     st.subheader(f"Charts: {report_type}")
 
+    # ---- Custom Uploaded Data — no pre-built charts ------------------------
+    if report_type == "Custom Uploaded Data":
+        st.info(
+            "Charts are not available for custom uploaded data. "
+            "View your data in the **Data** tab or generate a report in the **Report** tab."
+        )
+
     # ---- KPI Summary chart -------------------------------------------------
-    if report_type == "Q1 2024 KPI Summary":
+    elif report_type == "Q1 2024 KPI Summary":
         kpi_data = load_kpi_data()
         kpis = kpi_data.get("kpis", [])
         if kpis:

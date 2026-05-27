@@ -102,6 +102,36 @@ DATASETS = {
             "List the top 5 customers by annual revenue.",
         ],
     },
+    "RD Wholesaler Activity": {
+        "filename": "rd_wholesaler_activity.csv",
+        "description": (
+            "Relationship Director (RD) activity log covering Jan 2025–May 2026. "
+            "Tracks wholesaler touchpoints with RIA firms across regions, including "
+            "activity type, outcome, AUM discussed, and products pitched."
+        ),
+        "examples": [
+            "Which RD had the most 'Closed/Won' outcomes in Q1 2026?",
+            "Show total AUM discussed by region and activity type.",
+            "Which RIA firms have been contacted most frequently in 2026 YTD?",
+            "What is the conversion rate (Closed/Won) by RD?",
+            "List all activities where AUM discussed exceeded $200M.",
+        ],
+    },
+    "RIA Distribution Metrics": {
+        "filename": "ria_distribution_metrics.csv",
+        "description": (
+            "Snapshot of RIA firm distribution metrics as of May 2026. Covers 25 "
+            "RIA relationships including AUM, net flows, product mix, engagement "
+            "scores, and platform capture rates."
+        ),
+        "examples": [
+            "Which RIA firms are classified as At-Risk with negative net flows YTD?",
+            "What is the average platform capture percentage by RD owner?",
+            "Show AUM on platform by region sorted descending.",
+            "Which Platinum-tier firms have an engagement score below 7?",
+            "Compare net flows QTD vs YTD for all Growth-status firms.",
+        ],
+    },
 }
 
 # ---------------------------------------------------------------------------

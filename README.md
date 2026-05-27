@@ -216,4 +216,13 @@ genai-demo/
 │       └── deploy.yml
 └── README.md
 ```
-"" 
+
+---
+
+## Adding a New App
+
+See [docs/APP_DEVELOPER_VS_INFRA.md](docs/APP_DEVELOPER_VS_INFRA.md) for the
+full responsibility matrix and handoff checklist.
+
+Use `apps/template_app/` as the starting point for any new Streamlit app.
+

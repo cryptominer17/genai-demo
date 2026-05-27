@@ -133,3 +133,95 @@ This directory contains three CSV files used as shared mock data across the PoC 
 3. "List all Strategic-tier customers and their account managers."
 4. "Which region has the highest average health score?"
 5. "Show customers with renewal probability below 0.85 sorted by ARR descending."
+
+---
+
+## 4. rd_wholesaler_activity.csv
+
+**Purpose:** Relationship Director (RD) activity log covering January 2025 through May 2026. Tracks 120 wholesaler touchpoints with RIA firms across six US regions, capturing activity type, outcome, AUM discussed, and products pitched. Used for RD performance analysis, pipeline management, and sales conversion reporting.
+
+**Row count:** 120 rows
+
+### Schema
+
+| Column | Type | Description |
+|---|---|---|
+| activity_id | string | Unique activity identifier (ACT-0001 to ACT-0120) |
+| rd_name | string | Relationship Director name (6 RDs: Michael Tanaka, Priya Nambiar, Dana Whitfield, James Odem, Carlos Rivera, Lisa Huang) |
+| region | string | RD's primary coverage region (Southwest, Northeast, West, Southeast, Northwest, Midwest) |
+| activity_date | date (YYYY-MM-DD) | Date the activity occurred (Jan 2025–May 2026) |
+| activity_type | string | Type of activity: Phone Call, In-Person Visit, Email Campaign, Webinar, Conference |
+| ria_firm_contacted | string | Name of the RIA firm contacted (18 distinct firms) |
+| ria_tier | string | RIA firm tier: Platinum (>$400M AUM on platform), Gold ($100M–$400M), Silver ($25M–$100M), Bronze (<$25M) |
+| outcome | string | Activity outcome: Meeting Scheduled, Follow-Up Required, Proposal Sent, Closed/Won, No Action |
+| aum_discussed_m | float | AUM discussed in millions USD (0.0 for No Action / Email Campaign with no follow-up) |
+| products_pitched | string | Pipe-delimited list of products discussed: ETF, Mutual Fund, Model Portfolio, SMAs |
+| follow_up_date | date (YYYY-MM-DD) | Scheduled follow-up date (~60% of rows populated; blank for ~40%) |
+| notes | string | Synthetic one-sentence summary of the activity |
+
+### Key Statistics
+
+| Metric | Value |
+|---|---|
+| Total activities | 120 |
+| Date range | 2025-01-08 to 2026-05-21 |
+| Rows per RD | 20 each (6 RDs) |
+| Closed/Won outcomes | 18 (15% conversion rate) |
+| Distinct RIA firms | 18 |
+
+### Example Natural Language Queries
+
+1. "Which RD had the most 'Closed/Won' outcomes in Q1 2026?"
+2. "Show total AUM discussed by region and activity type."
+3. "Which RIA firms have been contacted most frequently in 2026 YTD?"
+4. "What is the conversion rate (Closed/Won) by RD?"
+5. "List all activities where AUM discussed exceeded $200M."
+
+---
+
+## 5. ria_distribution_metrics.csv
+
+**Purpose:** Point-in-time snapshot of RIA firm distribution metrics as of May 2026. Covers 25 RIA relationships (13 from the core BI dashboard plus 12 newer relationships), including platform AUM, net flows, product mix, engagement scores, and platform capture rates. Used for relationship health monitoring, territory planning, and distribution performance reporting.
+
+**Row count:** 25 rows
+
+### Schema
+
+| Column | Type | Description |
+|---|---|---|
+| ria_firm_id | string | Unique RIA firm identifier (RIA-001 to RIA-025) |
+| ria_firm_name | string | Full RIA firm name |
+| region | string | Geographic region (Southwest, Northeast, West, Southeast, Northwest, Midwest) |
+| rd_owner | string | Assigned Relationship Director name |
+| ria_tier | string | Tier based on AUM on platform: Platinum (>$400M), Gold ($100M–$400M), Silver ($25M–$100M), Bronze (<$25M) |
+| aum_on_platform_m | float | AUM currently on the platform in millions USD |
+| total_aum_m | float | Firm's total AUM under management in millions USD |
+| platform_capture_pct | float | Platform AUM as a percentage of total AUM (aum_on_platform_m / total_aum_m × 100, rounded to 1 decimal) |
+| net_flows_qtd_m | float | Net flows into platform (current quarter to date) in millions USD |
+| net_flows_ytd_m | float | Net flows into platform (year to date 2026) in millions USD |
+| product_mix_pct_etf | integer | Percentage of platform AUM in ETFs (all product mix columns sum to 100) |
+| product_mix_pct_mutual_fund | integer | Percentage of platform AUM in Mutual Funds |
+| product_mix_pct_model_portfolio | integer | Percentage of platform AUM in Model Portfolios |
+| product_mix_pct_sma | integer | Percentage of platform AUM in SMAs |
+| engagement_score | integer | Engagement score 1–10 (At-Risk: 1–5, Active: 5–8, Growth: 8–10, New: 4–7) |
+| last_rd_touchpoint | date (YYYY-MM-DD) | Date of most recent RD activity with this firm (2026-01-15 to 2026-05-20) |
+| touchpoint_count_ytd | integer | Number of RD touchpoints in 2026 YTD (range 1–15) |
+| status | string | Relationship status: Active, Growth, At-Risk, New |
+| primary_product_interest | string | Primary product area of interest: ETF, Mutual Fund, Model Portfolio, SMAs |
+| onboarding_date | date (YYYY-MM-DD) | Date the firm was onboarded to the platform (2020-01-01 to 2025-12-31) |
+
+### Data Quality Notes
+
+- Product mix columns (`product_mix_pct_etf`, `product_mix_pct_mutual_fund`, `product_mix_pct_model_portfolio`, `product_mix_pct_sma`) sum to exactly 100 for every row.
+- `platform_capture_pct` is computed as `round(aum_on_platform_m / total_aum_m * 100, 1)` and falls between 35% and 51% across all firms.
+- `net_flows_ytd_m` is negative or near zero for all At-Risk firms and positive for all Growth firms.
+- Rows RIA-001 through RIA-013 correspond to the 13 core firms in `demo_bi_dashboard_data.json`; AUM, flows, engagement scores, product mix, and status values match the JSON exactly.
+- Rows RIA-014 through RIA-025 are additional firms introduced in this dataset.
+
+### Example Natural Language Queries
+
+1. "Which RIA firms are classified as At-Risk with negative net flows YTD?"
+2. "What is the average platform capture percentage by RD owner?"
+3. "Show AUM on platform by region sorted descending."
+4. "Which Platinum-tier firms have an engagement score below 7?"
+5. "Compare net flows QTD vs YTD for all Growth-status firms."
