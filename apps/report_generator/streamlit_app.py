@@ -113,14 +113,15 @@ def load_forecast_data() -> pd.DataFrame:
             "confidence_interval_low": "lower_bound",
             "confidence_interval_high": "upper_bound",
         })
+        if "forecast" not in df.columns:
+            raise ValueError("CSV is missing required 'forecast'/'forecast_revenue' column")
         return df
-    except FileNotFoundError:
+    except (FileNotFoundError, ValueError):
         # Fallback: generate synthetic 12-month forecast
         import numpy as np
 
         rng = np.random.default_rng(42)
         months = pd.date_range("2024-01-01", periods=12, freq="MS").strftime("%b %Y").tolist()
-        actuals = [None] * 3 + [None] * 9  # only Q1 has actuals
         actual_vals = [188, 195, 203] + [None] * 9
         forecast = [188, 195, 203, 210, 218, 225, 232, 241, 249, 258, 266, 275]
         lower = [v - rng.integers(8, 15) if v else None for v in forecast]
