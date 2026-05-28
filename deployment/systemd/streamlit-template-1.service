@@ -1,0 +1,25 @@
+[Unit]
+Description=Streamlit Data Extraction & Enrichment App (Port 8506)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/streamlit run apps/Template_1/streamlit_app.py \
+  --server.port 8506 \
+  --server.address localhost \
+  --server.baseUrlPath /Template_1 \
+  --server.headless true \
+  --browser.gatherUsageStats false
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/template-1.log
+StandardError=append:/var/log/streamlit/template-1-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target
