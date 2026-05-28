@@ -105,7 +105,15 @@ def load_kpi_data() -> dict:
 def load_forecast_data() -> pd.DataFrame:
     """Load 12-month sales forecast CSV from bi_data."""
     try:
-        return load_csv("sales_forecast_12mo.csv", subfolder="bi_data")
+        df = load_csv("sales_forecast_12mo.csv", subfolder="bi_data")
+        # Normalize CSV column names to the internal schema expected by charts
+        df = df.rename(columns={
+            "forecast_revenue": "forecast",
+            "historical_actual": "actual",
+            "confidence_interval_low": "lower_bound",
+            "confidence_interval_high": "upper_bound",
+        })
+        return df
     except FileNotFoundError:
         # Fallback: generate synthetic 12-month forecast
         import numpy as np
