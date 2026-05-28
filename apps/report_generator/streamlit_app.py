@@ -116,7 +116,7 @@ def load_forecast_data() -> pd.DataFrame:
         if "forecast" not in df.columns:
             raise ValueError("CSV is missing required 'forecast'/'forecast_revenue' column")
         return df
-    except (FileNotFoundError, ValueError):
+    except Exception:
         # Fallback: generate synthetic 12-month forecast
         import numpy as np
 
