@@ -1,0 +1,25 @@
+[Unit]
+Description=Streamlit Template 2 — Content Generation (Port 8507)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=streamlit
+Group=streamlit
+WorkingDirectory=/opt/fi-genai-poc-platform
+ExecStart=/opt/fi-genai-poc-platform/venv/bin/streamlit run apps/Template_2/streamlit_app.py \
+  --server.port 8507 \
+  --server.address localhost \
+  --server.baseUrlPath /Template_2 \
+  --server.headless true \
+  --browser.gatherUsageStats false
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/streamlit/template-2.log
+StandardError=append:/var/log/streamlit/template-2-error.log
+EnvironmentFile=/opt/fi-genai-poc-platform/.env
+Environment="PYTHONPATH=/opt/fi-genai-poc-platform"
+
+[Install]
+WantedBy=multi-user.target
